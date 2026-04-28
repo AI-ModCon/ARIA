@@ -1,0 +1,58 @@
+{
+  "profileId": "core-v1",
+  "version": "1.0.0",
+  "description": "Mandatory GMP core profile for v1 deployments.",
+  "requiredApiSpec": "../openapi/gmp-core-v1.yaml",
+  "requiredOperations": [
+    "exchangeToken",
+    "listCapabilities",
+    "registerCapability",
+    "getCapability",
+    "evaluatePolicy",
+    "submitRun",
+    "getRun",
+    "cancelRun",
+    "retryRun",
+    "listTargetAvailability",
+    "appendJournalEvent",
+    "listJournalEvents"
+  ],
+  "requiredSchemas": [
+    "../schemas/common/execution-context.schema.json",
+    "../schemas/common/artifact.schema.json",
+    "../schemas/common/dataset-ref.schema.json",
+    "../schemas/common/capability.schema.json",
+    "../schemas/common/policy-decision.schema.json",
+    "../schemas/common/run.schema.json",
+    "../schemas/common/journal-event.schema.json",
+    "../schemas/common/availability.schema.json",
+    "../schemas/common/identity-claims.schema.json",
+    "../schemas/events/failure-taxonomy.schema.json",
+    "../schemas/events/event-envelope.schema.json",
+    "../schemas/events/run-lifecycle-event.schema.json",
+    "../schemas/events/policy-check-event.schema.json"
+  ],
+  "reproducibilityTiers": {
+    "tier1_declared": {
+      "description": "Capability is declared with valid metadata and references."
+    },
+    "tier2_smoke_tested": {
+      "description": "Capability executable artifact passes clean-profile smoke test."
+    },
+    "tier3_independently_replicated": {
+      "description": "Capability replication passes structured agreement checks on independent hardware."
+    }
+  },
+  "complianceChecks": [
+    "openapi_valid",
+    "all_refs_resolve",
+    "required_operations_present",
+    "failure_taxonomy_consistent",
+    "schema_examples_present"
+  ],
+  "extensionPolicy": {
+    "allowed": true,
+    "namespaceRule": "Extensions must use x-gmp-* fields or /v1/extensions/* routes.",
+    "coreCompatibilityRequired": true
+  }
+}

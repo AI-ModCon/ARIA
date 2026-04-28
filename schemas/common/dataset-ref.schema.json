@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/dataset-ref.schema.json",
+  "title": "DatasetRef",
+  "type": "object",
+  "required": ["datasetId", "version", "uri", "accessPrerequisites"],
+  "properties": {
+    "datasetId": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "uri": { "type": "string", "format": "uri" },
+    "accessPrerequisites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "value"],
+        "properties": {
+          "type": { "type": "string", "enum": ["license", "citizenship", "training", "embargo", "agreement"] },
+          "value": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "mirrorPolicy": { "type": "string", "enum": ["mirror", "link", "restricted"] }
+  },
+  "additionalProperties": false
+}

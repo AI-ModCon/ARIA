@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/events/run-lifecycle-event.schema.json",
+  "title": "RunLifecycleEvent",
+  "allOf": [
+    { "$ref": "./event-envelope.schema.json" },
+    {
+      "type": "object",
+      "properties": {
+        "eventType": {
+          "type": "string",
+          "enum": [
+            "run.submitted",
+            "run.started",
+            "run.target_failed",
+            "run.retry",
+            "run.completed",
+            "run.failed"
+          ]
+        },
+        "payload": {
+          "type": "object",
+          "required": ["runId", "capabilityId", "status", "failureClass"],
+          "properties": {
+            "runId": { "type": "string", "minLength": 1 },
+            "capabilityId": { "type": "string", "minLength": 1 },
+            "status": {
+              "type": "string",
+              "enum": ["queued", "running", "succeeded", "failed", "cancelled"]
+            },
+            "failureClass": { "$ref": "./failure-taxonomy.schema.json" },
+            "targetOutcomes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["targetId", "state"],
+                "properties": {
+                  "targetId": { "type": "string" },
+                  "state": { "type": "string", "enum": ["submitted", "running", "failed", "succeeded", "skipped"] }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["eventType", "payload"]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/events/policy-check-event.schema.json",
+  "title": "PolicyCheckEvent",
+  "allOf": [
+    { "$ref": "./event-envelope.schema.json" },
+    {
+      "type": "object",
+      "properties": {
+        "eventType": {
+          "type": "string",
+          "enum": ["policy.checked"]
+        },
+        "payload": {
+          "type": "object",
+          "required": ["principalId", "resourceId", "decision", "failureClass"],
+          "properties": {
+            "principalId": { "type": "string" },
+            "resourceId": { "type": "string" },
+            "decision": { "type": "string", "enum": ["allow", "deny", "conditional"] },
+            "rationaleCode": { "type": "string" },
+            "failureClass": { "$ref": "./failure-taxonomy.schema.json" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["eventType", "payload"]
+    }
+  ]
+}

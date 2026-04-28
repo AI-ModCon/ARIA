@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/availability.schema.json",
+  "title": "Availability",
+  "type": "object",
+  "required": ["targetId", "status", "heartbeatAt", "freshnessClass"],
+  "properties": {
+    "targetId": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["registered", "submittable", "degraded", "offline"] },
+    "heartbeatAt": { "type": "string", "format": "date-time" },
+    "freshnessClass": { "type": "string", "enum": ["stale", "current", "realtime"] },
+    "queueDepth": { "type": "integer", "minimum": 0 },
+    "walltimeEstimateMinutes": { "type": "integer", "minimum": 0 },
+    "throughputClass": { "type": "string", "enum": ["low", "medium", "high", "hpc"] }
+  },
+  "additionalProperties": false
+}

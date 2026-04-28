@@ -1,0 +1,495 @@
+openapi: 3.1.0
+info:
+  title: GMP Core API
+  version: 1.0.0
+  description: >-
+    Genesis Mission Platform core API surface for identity, capability discovery,
+    run control, policy decisions, availability, and journaling.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://api.gmp.example/v1
+security:
+  - bearerAuth: []
+paths:
+  /v1/identity/token-exchange:
+    post:
+      operationId: exchangeToken
+      tags: [IdentityTrust]
+      summary: Exchange external token for GMP token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subjectToken, audience]
+              properties:
+                subjectToken:
+                  type: string
+                audience:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/TokenExchangeSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/capabilities:
+    get:
+      operationId: listCapabilities
+      tags: [CapabilityRegistry]
+      summary: List discoverable capabilities
+      parameters:
+        - in: query
+          name: profile
+          schema:
+            type: string
+            enum: [core, optional]
+        - in: query
+          name: runnableOnly
+          schema:
+            type: boolean
+      responses:
+        '200':
+          $ref: '#/components/responses/CapabilityListSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      operationId: registerCapability
+      tags: [CapabilityRegistry]
+      summary: Register capability metadata
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/capability.schema.json
+      responses:
+        '201':
+          $ref: '#/components/responses/CapabilityCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/capabilities/{capabilityId}:
+    get:
+      operationId: getCapability
+      tags: [CapabilityRegistry]
+      summary: Fetch a capability
+      parameters:
+        - in: path
+          name: capabilityId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/CapabilitySuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/policy/decide:
+    post:
+      operationId: evaluatePolicy
+      tags: [PolicyDecision]
+      summary: Evaluate policy for a requested action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [principalId, action, resourceId]
+              properties:
+                principalId:
+                  type: string
+                action:
+                  type: string
+                resourceId:
+                  type: string
+                prerequisites:
+                  type: array
+                  items:
+                    type: object
+                    required: [type, value]
+                    properties:
+                      type:
+                        type: string
+                      value:
+                        type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/PolicyDecisionSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/runs:
+    post:
+      operationId: submitRun
+      tags: [RunControl]
+      summary: Submit run request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [capabilityId, executionContext, idempotencyKey]
+              properties:
+                capabilityId:
+                  type: string
+                executionContext:
+                  $ref: ../schemas/common/execution-context.schema.json
+                idempotencyKey:
+                  type: string
+                targetStrategy:
+                  type: object
+                  required: [mode, targets]
+                  properties:
+                    mode:
+                      type: string
+                      enum: [single_target, multi_target_first_success]
+                    targets:
+                      type: array
+                      minItems: 1
+                      items:
+                        type: string
+      responses:
+        '202':
+          $ref: '#/components/responses/RunAccepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/runs/{runId}:
+    get:
+      operationId: getRun
+      tags: [RunControl]
+      summary: Fetch run status
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/RunSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/runs/{runId}/cancel:
+    post:
+      operationId: cancelRun
+      tags: [RunControl]
+      summary: Cancel an active run
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/runs/{runId}/retry:
+    post:
+      operationId: retryRun
+      tags: [RunControl]
+      summary: Retry failed run
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                override:
+                  type: object
+                  additionalProperties:
+                    type: [string, number, boolean, 'null']
+      responses:
+        '202':
+          $ref: '#/components/responses/RunAccepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/availability/targets:
+    get:
+      operationId: listTargetAvailability
+      tags: [Availability]
+      summary: List target liveness and readiness
+      responses:
+        '200':
+          $ref: '#/components/responses/AvailabilityListSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/journal/events:
+    post:
+      operationId: appendJournalEvent
+      tags: [JournalProvenance]
+      summary: Append a journal/provenance event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/journal-event.schema.json
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    get:
+      operationId: listJournalEvents
+      tags: [JournalProvenance]
+      summary: Query journal events by run
+      parameters:
+        - in: query
+          name: runId
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/JournalEventListSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    TokenExchangeResponse:
+      type: object
+      required: [accessToken, expiresIn, claims]
+      properties:
+        accessToken:
+          type: string
+        expiresIn:
+          type: integer
+        claims:
+          $ref: ../schemas/common/identity-claims.schema.json
+    CapabilityListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: ../schemas/common/capability.schema.json
+    AvailabilityListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: ../schemas/common/availability.schema.json
+    JournalEventListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: ../schemas/common/journal-event.schema.json
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+  responses:
+    TokenExchangeSuccess:
+      description: Token exchange success.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TokenExchangeResponse'
+    CapabilityListSuccess:
+      description: Capability list.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CapabilityListResponse'
+    CapabilityCreated:
+      description: Capability registered.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/capability.schema.json
+    CapabilitySuccess:
+      description: Capability details.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/capability.schema.json
+    PolicyDecisionSuccess:
+      description: Policy decision result.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/policy-decision.schema.json
+    RunAccepted:
+      description: Run accepted for execution.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/run.schema.json
+    RunSuccess:
+      description: Run details.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/run.schema.json
+    AvailabilityListSuccess:
+      description: Availability list.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AvailabilityListResponse'
+    JournalEventListSuccess:
+      description: Journal events.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/JournalEventListResponse'
+    AcceptedNoContent:
+      description: Request accepted for asynchronous processing.
+    BadRequest:
+      description: Request validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid authentication credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Authenticated but not authorized for requested action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Request conflicts with current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Unexpected internal service error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+tags:
+  - name: IdentityTrust
+    description: Identity assertion, token exchange, and delegation chain contracts.
+  - name: CapabilityRegistry
+    description: Capability registration, discovery, and artifact metadata contracts.
+  - name: RunControl
+    description: Submission, lifecycle, cancellation, and retry contracts for runs.
+  - name: PolicyDecision
+    description: Policy evaluation contracts and obligation semantics.
+  - name: Availability
+    description: Target liveness, readiness, and scheduling signal contracts.
+  - name: JournalProvenance
+    description: Journal append/query contracts for provenance and run events.

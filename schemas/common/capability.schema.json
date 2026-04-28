@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/capability.schema.json",
+  "title": "Capability",
+  "type": "object",
+  "required": ["capabilityId", "name", "version", "profile", "executionContext", "artifact", "status"],
+  "properties": {
+    "capabilityId": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "profile": { "type": "string", "enum": ["core", "optional"] },
+    "domain": { "type": "string" },
+    "executionContext": { "$ref": "./execution-context.schema.json" },
+    "artifact": { "$ref": "./artifact.schema.json" },
+    "status": {
+      "type": "string",
+      "enum": ["declared", "smoke_test_passed", "smoke_test_failed", "deprecated"]
+    },
+    "reproducibilityTier": {
+      "type": "string",
+      "enum": ["tier1_declared", "tier2_smoke_tested", "tier3_independently_replicated"]
+    }
+  },
+  "additionalProperties": false
+}

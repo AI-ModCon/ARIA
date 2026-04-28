@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/execution-context.schema.json",
+  "title": "ExecutionContext",
+  "type": "object",
+  "required": ["configHash", "environmentHash", "seedList", "dataVersion"],
+  "properties": {
+    "configHash": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+    "environmentHash": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+    "seedList": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "integer" }
+    },
+    "dataVersion": { "type": "string", "minLength": 1 },
+    "toolchain": { "type": "string" },
+    "overrides": {
+      "type": "object",
+      "additionalProperties": { "type": ["string", "number", "boolean", "null"] }
+    }
+  },
+  "additionalProperties": false
+}

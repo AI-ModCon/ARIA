@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/identity-claims.schema.json",
+  "title": "IdentityClaims",
+  "type": "object",
+  "required": ["principalId", "workloadId", "delegationChain"],
+  "properties": {
+    "principalId": { "type": "string", "minLength": 1 },
+    "workloadId": { "type": "string", "minLength": 1 },
+    "delegationChain": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["actor", "issuedAt"],
+        "properties": {
+          "actor": { "type": "string" },
+          "issuedAt": { "type": "string", "format": "date-time" },
+          "scope": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

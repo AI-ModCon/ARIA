@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/run.schema.json",
+  "title": "Run",
+  "type": "object",
+  "required": ["runId", "capabilityId", "status", "submittedAt", "executionContext", "failureClass"],
+  "properties": {
+    "runId": { "type": "string", "minLength": 1 },
+    "capabilityId": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["queued", "running", "succeeded", "failed", "cancelled"]
+    },
+    "submittedAt": { "type": "string", "format": "date-time" },
+    "completedAt": { "type": "string", "format": "date-time" },
+    "idempotencyKey": { "type": "string" },
+    "executionContext": { "$ref": "./execution-context.schema.json" },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["targetId", "state"],
+        "properties": {
+          "targetId": { "type": "string" },
+          "state": { "type": "string", "enum": ["submitted", "running", "failed", "succeeded", "skipped"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "failureClass": {
+      "type": "string",
+      "enum": ["F0_NONE", "F1_MISSING_ARTIFACT", "F2_ENVIRONMENT", "F3_DATA_ACCESS", "F4_POLICY", "F5_UNSPECIFIED_CONFIG", "F6_HPC_QUEUE", "F7_RUNTIME", "F8_DOMAIN_ASSUMPTION"]
+    }
+  },
+  "additionalProperties": false
+}

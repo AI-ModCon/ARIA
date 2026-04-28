@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/artifact.schema.json",
+  "title": "Artifact",
+  "type": "object",
+  "required": ["artifactId", "kind", "uri", "digest", "lockfileUri", "invocationManifestUri", "datasetRefs"],
+  "properties": {
+    "artifactId": { "type": "string", "minLength": 1 },
+    "kind": { "type": "string", "enum": ["code", "model", "workflow", "container"] },
+    "uri": { "type": "string", "format": "uri" },
+    "digest": { "type": "string", "pattern": "^sha256:[a-fA-F0-9]{64}$" },
+    "lockfileUri": { "type": "string", "format": "uri" },
+    "invocationManifestUri": { "type": "string", "format": "uri" },
+    "datasetRefs": {
+      "type": "array",
+      "items": { "$ref": "./dataset-ref.schema.json" }
+    },
+    "smokeTestStatus": {
+      "type": "string",
+      "enum": ["not_tested", "passed", "failed"]
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/journal-event.schema.json",
+  "title": "JournalEvent",
+  "type": "object",
+  "required": ["eventId", "runId", "eventType", "timestamp", "failureClass"],
+  "properties": {
+    "eventId": { "type": "string", "minLength": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "eventType": {
+      "type": "string",
+      "enum": ["run.submitted", "run.started", "run.target_failed", "run.retry", "run.completed", "run.failed", "policy.checked", "artifact.validated"]
+    },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "failureClass": {
+      "type": "string",
+      "enum": ["F0_NONE", "F1_MISSING_ARTIFACT", "F2_ENVIRONMENT", "F3_DATA_ACCESS", "F4_POLICY", "F5_UNSPECIFIED_CONFIG", "F6_HPC_QUEUE", "F7_RUNTIME", "F8_DOMAIN_ASSUMPTION"]
+    },
+    "lineageRefs": {
+      "type": "array",
+      "items": { "type": "string", "format": "uri" }
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
