@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/budget-policy.schema.json",
+  "title": "BudgetPolicy",
+  "type": "object",
+  "required": ["budgetId", "scope", "maxTokens", "maxToolCalls", "maxSpendUsd", "enforcementMode"],
+  "properties": {
+    "budgetId": { "type": "string", "minLength": 1 },
+    "scope": { "type": "string", "enum": ["task", "tenant", "user"] },
+    "maxTokens": { "type": "integer", "minimum": 0 },
+    "maxToolCalls": { "type": "integer", "minimum": 0 },
+    "maxSpendUsd": { "type": "number", "minimum": 0 },
+    "enforcementMode": { "type": "string", "enum": ["hard_stop", "degrade_model", "alert_only"] }
+  },
+  "additionalProperties": false
+}

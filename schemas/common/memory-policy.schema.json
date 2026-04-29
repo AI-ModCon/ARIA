@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/memory-policy.schema.json",
+  "title": "MemoryPolicy",
+  "type": "object",
+  "required": ["retentionSeconds", "summarizationMode", "sharingMode", "privacyTags"],
+  "properties": {
+    "retentionSeconds": { "type": "integer", "minimum": 0 },
+    "summarizationMode": { "type": "string", "enum": ["none", "periodic", "on_write"] },
+    "sharingMode": { "type": "string", "enum": ["private", "tenant", "cross_agent"] },
+    "privacyTags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "complianceBasis": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

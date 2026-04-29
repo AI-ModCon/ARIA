@@ -1,0 +1,14 @@
+{
+  "eventId": "evt_tool_01",
+  "eventType": "tool.call",
+  "occurredAt": "2026-04-28T22:09:08Z",
+  "source": "agent.support.refunds",
+  "correlationId": "run_01K3RUN0001",
+  "payload": {
+    "runId": "run_01K3RUN0001",
+    "toolName": "crm.fetchOrders",
+    "status": "succeeded",
+    "latencyMs": 182,
+    "tokenCost": 140
+  }
+}

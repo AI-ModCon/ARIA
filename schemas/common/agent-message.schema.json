@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/agent-message.schema.json",
+  "title": "AgentMessage",
+  "type": "object",
+  "required": ["messageId", "fromAgentId", "toAgentId", "kind", "sentAt", "expiresAt"],
+  "properties": {
+    "messageId": { "type": "string", "minLength": 1 },
+    "fromAgentId": { "type": "string", "minLength": 1 },
+    "toAgentId": { "type": "string", "minLength": 1 },
+    "kind": { "type": "string", "enum": ["task", "handoff", "query", "result", "control"] },
+    "payload": { "type": "object", "additionalProperties": true },
+    "sentAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

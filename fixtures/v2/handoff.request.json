@@ -1,0 +1,8 @@
+{
+  "handoffId": "handoff_01K3H001",
+  "fromAgentId": "agent.support.refunds",
+  "toAgentId": "agent.support.payments",
+  "taskRef": "task_01K3TASK0001",
+  "reason": "payment_ledger_investigation_required",
+  "createdAt": "2026-04-28T22:10:20Z"
+}

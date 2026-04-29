@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/model-routing-policy.schema.json",
+  "title": "ModelRoutingPolicy",
+  "type": "object",
+  "required": ["policyId", "defaultTier", "fallbackTiers"],
+  "properties": {
+    "policyId": { "type": "string", "minLength": 1 },
+    "defaultTier": { "type": "string", "enum": ["cheap_fast", "balanced", "expensive_smart"] },
+    "fallbackTiers": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["cheap_fast", "balanced", "expensive_smart"] }
+    },
+    "budgetAware": { "type": "boolean", "default": true }
+  },
+  "additionalProperties": false
+}

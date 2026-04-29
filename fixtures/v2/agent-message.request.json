@@ -1,0 +1,11 @@
+{
+  "messageId": "msg_01K3MSG001",
+  "fromAgentId": "agent.support.refunds",
+  "toAgentId": "agent.support.audit",
+  "kind": "query",
+  "payload": {
+    "question": "Does this refund need additional compliance checks?"
+  },
+  "sentAt": "2026-04-28T22:10:00Z",
+  "expiresAt": "2026-04-28T22:15:00Z"
+}

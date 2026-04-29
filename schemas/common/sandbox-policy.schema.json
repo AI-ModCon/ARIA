@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/sandbox-policy.schema.json",
+  "title": "SandboxPolicy",
+  "type": "object",
+  "required": ["policyId", "filesystemMode", "networkMode", "allowedDestinations"],
+  "properties": {
+    "policyId": { "type": "string", "minLength": 1 },
+    "filesystemMode": { "type": "string", "enum": ["read_only", "workspace_write", "isolated"] },
+    "networkMode": { "type": "string", "enum": ["deny_all", "allowlist", "full"] },
+    "allowedDestinations": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "rollbackRequired": { "type": "boolean", "default": true }
+  },
+  "additionalProperties": false
+}

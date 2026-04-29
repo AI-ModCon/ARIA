@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/cost-latency-hint.schema.json",
+  "title": "CostLatencyHint",
+  "type": "object",
+  "required": ["estimatedTokens", "estimatedToolCalls", "estimatedLatencyMs"],
+  "properties": {
+    "estimatedTokens": { "type": "integer", "minimum": 0 },
+    "estimatedToolCalls": { "type": "integer", "minimum": 0 },
+    "estimatedLatencyMs": { "type": "integer", "minimum": 0 },
+    "routingTier": { "type": "string", "enum": ["cheap_fast", "balanced", "expensive_smart"] }
+  },
+  "additionalProperties": false
+}

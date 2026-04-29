@@ -1,0 +1,8 @@
+{
+  "interventionId": "int_01K3INT001",
+  "queueItemId": "sq_01K3SQ001",
+  "actor": "human.supervisor.12",
+  "action": "approve",
+  "recordedAt": "2026-04-28T22:13:55Z",
+  "notes": "Reviewed evidence bundle and approved refund."
+}

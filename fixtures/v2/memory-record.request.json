@@ -1,0 +1,19 @@
+{
+  "memoryId": "mem_01K3MEM0001",
+  "agentId": "agent.support.refunds",
+  "kind": "episodic",
+  "content": "Customer requested refund due to duplicate charge.",
+  "createdAt": "2026-04-28T22:05:10Z",
+  "policy": {
+    "retentionSeconds": 2592000,
+    "summarizationMode": "periodic",
+    "sharingMode": "tenant",
+    "privacyTags": ["pii", "finance"],
+    "complianceBasis": "support_contract"
+  },
+  "sharing": {
+    "ownerAgentId": "agent.support.refunds",
+    "sharedWith": ["agent.support.audit"],
+    "accessLevel": "summary_only"
+  }
+}

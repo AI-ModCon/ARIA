@@ -1,0 +1,8 @@
+{
+  "budgetId": "bud_01K3BUDGET001",
+  "scope": "task",
+  "maxTokens": 150000,
+  "maxToolCalls": 200,
+  "maxSpendUsd": 5.0,
+  "enforcementMode": "degrade_model"
+}

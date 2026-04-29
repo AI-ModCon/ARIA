@@ -1,0 +1,9 @@
+{
+  "actionId": "act_01K3ACT001",
+  "proposedBy": "agent.support.refunds",
+  "effects": [
+    { "type": "api_call", "target": "payments.refund.charge_99881" },
+    { "type": "state_change", "target": "orders.order_4451.status" }
+  ],
+  "createdAt": "2026-04-28T22:11:45Z"
+}

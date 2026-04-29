@@ -1,0 +1,26 @@
+{
+  "tokenId": "tok_01K3EXAMPLE0001",
+  "subject": "agent.support.refunds",
+  "intent": {
+    "action": "orders.read",
+    "resource": "customer/cust_123/orders",
+    "reason": "refund_eligibility_review",
+    "maxDurationSeconds": 600,
+    "constraints": ["window:last_30_days"]
+  },
+  "scope": ["orders:read", "refunds:propose"],
+  "issuedAt": "2026-04-28T22:00:00Z",
+  "expiresAt": "2026-04-28T22:10:00Z",
+  "delegation": {
+    "principalId": "user_123",
+    "workloadId": "run_01K3WORKLOAD",
+    "delegationChain": [
+      {
+        "actor": "user_123",
+        "issuedAt": "2026-04-28T21:59:55Z",
+        "scope": "support-session"
+      }
+    ]
+  },
+  "revocationRef": "rev_01K3EXAMPLE0001"
+}

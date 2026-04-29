@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/divergence-alert.schema.json",
+  "title": "DivergenceAlert",
+  "type": "object",
+  "required": ["alertId", "runId", "expectedBehavior", "observedBehavior", "detectedAt"],
+  "properties": {
+    "alertId": { "type": "string", "minLength": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "expectedBehavior": { "type": "string", "minLength": 1 },
+    "observedBehavior": { "type": "string", "minLength": 1 },
+    "detectedAt": { "type": "string", "format": "date-time" },
+    "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] }
+  },
+  "additionalProperties": false
+}

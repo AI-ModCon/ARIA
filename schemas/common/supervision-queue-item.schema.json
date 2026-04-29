@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/supervision-queue-item.schema.json",
+  "title": "SupervisionQueueItem",
+  "type": "object",
+  "required": ["queueItemId", "runId", "reason", "priority", "createdAt"],
+  "properties": {
+    "queueItemId": { "type": "string", "minLength": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 },
+    "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

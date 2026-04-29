@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/workflow-state.schema.json",
+  "title": "WorkflowState",
+  "type": "object",
+  "required": ["runId", "stateVersion", "status", "updatedAt"],
+  "properties": {
+    "runId": { "type": "string", "minLength": 1 },
+    "stateVersion": { "type": "integer", "minimum": 1 },
+    "status": { "type": "string", "enum": ["running", "paused", "resumable", "completed", "failed"] },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "inputSnapshotHash": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+    "toolResultHash": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" }
+  },
+  "additionalProperties": false
+}

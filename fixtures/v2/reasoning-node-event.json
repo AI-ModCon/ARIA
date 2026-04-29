@@ -1,0 +1,14 @@
+{
+  "eventId": "evt_reason_01",
+  "eventType": "reasoning.node",
+  "occurredAt": "2026-04-28T22:09:00Z",
+  "source": "agent.support.refunds",
+  "correlationId": "run_01K3RUN0001",
+  "payload": {
+    "runId": "run_01K3RUN0001",
+    "nodeId": "node_002",
+    "parentNodeId": "node_001",
+    "decision": "request_human_approval",
+    "evidenceRefs": ["https://evidence.example/orders/order_4451"]
+  }
+}

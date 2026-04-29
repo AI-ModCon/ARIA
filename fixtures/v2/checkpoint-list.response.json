@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "checkpointId": "chk_01K3CHKPT001",
+      "runId": "run_01K3RUN0001",
+      "sequence": 1,
+      "createdAt": "2026-04-28T22:02:00Z",
+      "stateRef": "https://state.example/runs/run_01K3RUN0001/chk_01K3CHKPT001"
+    },
+    {
+      "checkpointId": "chk_01K3CHKPT002",
+      "runId": "run_01K3RUN0001",
+      "sequence": 2,
+      "createdAt": "2026-04-28T22:04:30Z",
+      "stateRef": "https://state.example/runs/run_01K3RUN0001/chk_01K3CHKPT002",
+      "causalParentCheckpointId": "chk_01K3CHKPT001"
+    }
+  ]
+}

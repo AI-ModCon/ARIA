@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/checkpoint.schema.json",
+  "title": "Checkpoint",
+  "type": "object",
+  "required": ["checkpointId", "runId", "sequence", "createdAt", "stateRef"],
+  "properties": {
+    "checkpointId": { "type": "string", "minLength": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "stateRef": { "type": "string", "format": "uri" },
+    "causalParentCheckpointId": { "type": "string" }
+  },
+  "additionalProperties": false
+}

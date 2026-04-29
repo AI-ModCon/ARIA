@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/eval-result.schema.json",
+  "title": "EvalResult",
+  "type": "object",
+  "required": ["evalId", "suiteId", "status", "score", "createdAt"],
+  "properties": {
+    "evalId": { "type": "string", "minLength": 1 },
+    "suiteId": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["running", "passed", "failed"] },
+    "score": { "type": "number", "minimum": 0 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

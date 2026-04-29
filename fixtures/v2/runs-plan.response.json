@@ -1,0 +1,13 @@
+{
+  "negotiation": {
+    "mode": "dryRun",
+    "clarificationsAllowed": true,
+    "assumptions": ["customer_timezone=UTC", "refund_policy=v3"]
+  },
+  "costLatencyHint": {
+    "estimatedTokens": 1800,
+    "estimatedToolCalls": 6,
+    "estimatedLatencyMs": 2200,
+    "routingTier": "balanced"
+  }
+}

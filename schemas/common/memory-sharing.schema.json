@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/memory-sharing.schema.json",
+  "title": "MemorySharing",
+  "type": "object",
+  "required": ["ownerAgentId", "sharedWith", "accessLevel"],
+  "properties": {
+    "ownerAgentId": { "type": "string", "minLength": 1 },
+    "sharedWith": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "accessLevel": { "type": "string", "enum": ["read", "read_write", "summary_only"] }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,7 @@
+{
+  "consensusId": "cons_01K3C001",
+  "topic": "refund_amount_override",
+  "participants": ["agent.support.refunds", "agent.support.audit", "agent.support.payments"],
+  "result": "accepted",
+  "decidedAt": "2026-04-28T22:11:05Z"
+}

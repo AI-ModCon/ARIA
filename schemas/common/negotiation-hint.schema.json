@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/negotiation-hint.schema.json",
+  "title": "NegotiationHint",
+  "type": "object",
+  "required": ["mode", "clarificationsAllowed"],
+  "properties": {
+    "mode": { "type": "string", "enum": ["invoke", "dryRun", "explain", "clarify"] },
+    "clarificationsAllowed": { "type": "boolean" },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

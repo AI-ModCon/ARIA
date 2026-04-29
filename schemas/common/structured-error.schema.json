@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/structured-error.schema.json",
+  "title": "StructuredError",
+  "type": "object",
+  "required": ["code", "message", "recoverable"],
+  "properties": {
+    "code": { "type": "string", "minLength": 1 },
+    "message": { "type": "string", "minLength": 1 },
+    "recoverable": { "type": "boolean" },
+    "nextBestAction": { "type": "string" },
+    "missingInputs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

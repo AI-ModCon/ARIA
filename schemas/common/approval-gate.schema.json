@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/approval-gate.schema.json",
+  "title": "ApprovalGate",
+  "type": "object",
+  "required": ["gateId", "actionId", "requiredApprovers", "status"],
+  "properties": {
+    "gateId": { "type": "string", "minLength": 1 },
+    "actionId": { "type": "string", "minLength": 1 },
+    "requiredApprovers": { "type": "integer", "minimum": 1 },
+    "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+    "expiresAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

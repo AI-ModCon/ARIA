@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/consensus-decision.schema.json",
+  "title": "ConsensusDecision",
+  "type": "object",
+  "required": ["consensusId", "topic", "participants", "result", "decidedAt"],
+  "properties": {
+    "consensusId": { "type": "string", "minLength": 1 },
+    "topic": { "type": "string", "minLength": 1 },
+    "participants": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "result": { "type": "string", "enum": ["accepted", "rejected", "timeout"] },
+    "decidedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

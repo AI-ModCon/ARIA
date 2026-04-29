@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/events/reasoning-node-event.schema.json",
+  "title": "ReasoningNodeEvent",
+  "allOf": [
+    { "$ref": "./event-envelope.schema.json" },
+    {
+      "type": "object",
+      "properties": {
+        "eventType": { "type": "string", "enum": ["reasoning.node"] },
+        "payload": {
+          "type": "object",
+          "required": ["runId", "nodeId", "parentNodeId", "decision", "evidenceRefs"],
+          "properties": {
+            "runId": { "type": "string", "minLength": 1 },
+            "nodeId": { "type": "string", "minLength": 1 },
+            "parentNodeId": { "type": "string" },
+            "decision": { "type": "string", "minLength": 1 },
+            "evidenceRefs": {
+              "type": "array",
+              "items": { "type": "string", "format": "uri" }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["eventType", "payload"]
+    }
+  ]
+}

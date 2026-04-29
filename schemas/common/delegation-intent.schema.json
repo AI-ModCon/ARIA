@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/delegation-intent.schema.json",
+  "title": "DelegationIntent",
+  "type": "object",
+  "required": ["action", "resource", "reason", "maxDurationSeconds"],
+  "properties": {
+    "action": { "type": "string", "minLength": 1 },
+    "resource": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 },
+    "maxDurationSeconds": { "type": "integer", "minimum": 1 },
+    "constraints": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "additionalProperties": false
+}

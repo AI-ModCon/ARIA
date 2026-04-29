@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "alertId": "alert_01K3AL001",
+      "runId": "run_01K3RUN0001",
+      "expectedBehavior": "request approval before applying refund",
+      "observedBehavior": "attempted direct apply without approval",
+      "detectedAt": "2026-04-28T22:13:10Z",
+      "severity": "critical"
+    }
+  ]
+}

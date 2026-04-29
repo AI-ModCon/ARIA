@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/resume-token.schema.json",
+  "title": "ResumeToken",
+  "type": "object",
+  "required": ["runId", "checkpointId", "issuedAt", "expiresAt", "token"],
+  "properties": {
+    "runId": { "type": "string", "minLength": 1 },
+    "checkpointId": { "type": "string", "minLength": 1 },
+    "issuedAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "token": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

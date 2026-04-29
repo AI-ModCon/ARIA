@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/memory-record.schema.json",
+  "title": "MemoryRecord",
+  "type": "object",
+  "required": ["memoryId", "agentId", "kind", "content", "createdAt", "policy"],
+  "properties": {
+    "memoryId": { "type": "string", "minLength": 1 },
+    "agentId": { "type": "string", "minLength": 1 },
+    "kind": { "type": "string", "enum": ["episodic", "semantic", "entity", "summary"] },
+    "content": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "policy": { "$ref": "./memory-policy.schema.json" },
+    "sharing": { "$ref": "./memory-sharing.schema.json" }
+  },
+  "additionalProperties": false
+}

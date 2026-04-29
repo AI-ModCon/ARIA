@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "queueItemId": "sq_01K3SQ001",
+      "runId": "run_01K3RUN0001",
+      "reason": "human_approval_obligation",
+      "priority": "high",
+      "createdAt": "2026-04-28T22:12:30Z"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/revocation.schema.json",
+  "title": "Revocation",
+  "type": "object",
+  "required": ["tokenId", "reasonCode", "requestedAt", "effectiveBy"],
+  "properties": {
+    "tokenId": { "type": "string", "minLength": 1 },
+    "reasonCode": { "type": "string", "minLength": 1 },
+    "requestedAt": { "type": "string", "format": "date-time" },
+    "effectiveBy": { "type": "string", "format": "date-time" },
+    "auditRef": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

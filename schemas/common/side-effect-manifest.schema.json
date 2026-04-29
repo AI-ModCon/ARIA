@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/side-effect-manifest.schema.json",
+  "title": "SideEffectManifest",
+  "type": "object",
+  "required": ["actionId", "proposedBy", "effects", "createdAt"],
+  "properties": {
+    "actionId": { "type": "string", "minLength": 1 },
+    "proposedBy": { "type": "string", "minLength": 1 },
+    "effects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "target"],
+        "properties": {
+          "type": { "type": "string", "enum": ["file_write", "api_call", "state_change", "deletion"] },
+          "target": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}
