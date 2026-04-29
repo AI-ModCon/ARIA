@@ -1,0 +1,15 @@
+{
+  "eventId": "evt_journal_01",
+  "eventType": "journal.run.completed",
+  "occurredAt": "2026-04-29T12:05:00Z",
+  "source": "run-controller",
+  "correlationId": "run_01K3RUN0001",
+  "payload": {
+    "runId": "run_01K3RUN0001",
+    "failureClass": "F0_NONE",
+    "lineageRefs": ["https://provenance.example/lineage/run_01K3RUN0001"],
+    "details": {
+      "durationSeconds": 252
+    }
+  }
+}

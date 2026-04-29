@@ -1,0 +1,8 @@
+{
+  "taskId": "task_01K3TASK0001",
+  "tenantId": "tenant_acme",
+  "modelTokens": 125000,
+  "toolCalls": 128,
+  "externalSpendUsd": 2.74,
+  "recordedAt": "2026-04-28T22:07:00Z"
+}

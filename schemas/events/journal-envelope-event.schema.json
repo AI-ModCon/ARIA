@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/events/journal-envelope-event.schema.json",
+  "title": "JournalEnvelopeEvent",
+  "description": "Legacy journal/provenance semantics under the unified event envelope; eventType uses the journal.* namespace.",
+  "allOf": [
+    { "$ref": "./event-envelope-base.schema.json" },
+    {
+      "type": "object",
+      "properties": {
+        "eventType": {
+          "type": "string",
+          "enum": [
+            "journal.run.submitted",
+            "journal.run.started",
+            "journal.run.target_failed",
+            "journal.run.retry",
+            "journal.run.completed",
+            "journal.run.failed",
+            "journal.policy.checked",
+            "journal.artifact.validated"
+          ]
+        },
+        "payload": {
+          "type": "object",
+          "required": ["runId", "failureClass"],
+          "properties": {
+            "runId": { "type": "string", "minLength": 1 },
+            "failureClass": { "$ref": "./failure-taxonomy.schema.json" },
+            "lineageRefs": {
+              "type": "array",
+              "items": { "type": "string", "format": "uri" }
+            },
+            "details": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["eventType", "payload"]
+    }
+  ]
+}

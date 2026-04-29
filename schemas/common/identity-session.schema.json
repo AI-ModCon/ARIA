@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/identity-session.schema.json",
+  "title": "IdentitySession",
+  "description": "Bootstrap session after external token exchange; pairs with capability tokens for intent-scoped work.",
+  "type": "object",
+  "required": ["accessToken", "expiresIn", "claims"],
+  "properties": {
+    "accessToken": { "type": "string", "minLength": 1 },
+    "expiresIn": { "type": "integer", "minimum": 1 },
+    "claims": { "$ref": "./identity-claims.schema.json" }
+  },
+  "additionalProperties": false
+}

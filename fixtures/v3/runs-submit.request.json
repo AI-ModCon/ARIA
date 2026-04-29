@@ -1,0 +1,15 @@
+{
+  "capabilityId": "cap.simulation.kolmogorov.v1",
+  "planId": "plan_01JYV6HEP9V0M2B8Q62J4AYM4D",
+  "executionContext": {
+    "configHash": "a3e5d2571606f4f8a13f0f248f54f4e35f3e7f56d76d5f7c7a82f5f6567a0f84",
+    "environmentHash": "c3f7af31a1722ea9639f99d75cf4228fa30f7ec398bd6111f0cc4dbf19773621",
+    "seedList": [42],
+    "dataVersion": "2026.03"
+  },
+  "idempotencyKey": "idem-submit-01",
+  "targetStrategy": {
+    "mode": "single_target",
+    "targets": ["target-hpc-01"]
+  }
+}

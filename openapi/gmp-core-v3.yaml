@@ -1,0 +1,1230 @@
+openapi: 3.1.0
+info:
+  title: GMP Core API
+  version: 3.0.0
+  description: >-
+    Genesis Mission Platform v3 unified API: operational backbone (sessions, capability
+    registry, policy, run lifecycle, availability, events) plus agent-native identity,
+    negotiation, durable execution, memory, accounting, reasoning observability,
+    coordination, sandboxed actuation, and supervision. Non-core extensions use
+    x-gmp-* fields or routes under /v3/experimental/.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://api.gmp.example/v3
+security:
+  - bearerAuth: []
+paths:
+  /v3/identity/sessions:
+    post:
+      operationId: establishSession
+      tags: [IdentityTrust]
+      summary: Establish GMP session from external credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subjectToken, audience]
+              properties:
+                subjectToken:
+                  type: string
+                audience:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/IdentitySessionSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/capabilities:
+    get:
+      operationId: listCapabilities
+      tags: [CapabilityRegistry]
+      summary: List discoverable capabilities
+      parameters:
+        - in: query
+          name: profile
+          schema:
+            type: string
+            enum: [core, optional]
+        - in: query
+          name: runnableOnly
+          schema:
+            type: boolean
+      responses:
+        '200':
+          $ref: '#/components/responses/CapabilityListSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      operationId: registerCapability
+      tags: [CapabilityRegistry]
+      summary: Register capability metadata
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/capability.schema.json
+      responses:
+        '201':
+          $ref: '#/components/responses/CapabilityCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/capabilities/{capabilityId}:
+    get:
+      operationId: getCapability
+      tags: [CapabilityRegistry]
+      summary: Fetch a capability
+      parameters:
+        - in: path
+          name: capabilityId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/CapabilitySuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/policy/decide:
+    post:
+      operationId: evaluatePolicy
+      tags: [PolicyDecision]
+      summary: Evaluate policy for a requested action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [principalId, action, resourceId]
+              properties:
+                principalId:
+                  type: string
+                action:
+                  type: string
+                resourceId:
+                  type: string
+                prerequisites:
+                  type: array
+                  items:
+                    type: object
+                    required: [type, value]
+                    properties:
+                      type:
+                        type: string
+                      value:
+                        type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/PolicyDecisionSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/runs:
+    post:
+      operationId: submitRun
+      tags: [RunControl]
+      summary: Submit run request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [capabilityId, executionContext, idempotencyKey]
+              properties:
+                capabilityId:
+                  type: string
+                planId:
+                  type: string
+                  description: Optional plan identifier from POST /v3/runs:plan
+                executionContext:
+                  $ref: ../schemas/common/execution-context.schema.json
+                idempotencyKey:
+                  type: string
+                targetStrategy:
+                  type: object
+                  required: [mode, targets]
+                  properties:
+                    mode:
+                      type: string
+                      enum: [single_target, multi_target_first_success]
+                    targets:
+                      type: array
+                      minItems: 1
+                      items:
+                        type: string
+      responses:
+        '202':
+          $ref: '#/components/responses/RunAccepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/runs/{runId}:
+    get:
+      operationId: getRun
+      tags: [RunControl]
+      summary: Fetch run status
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/RunSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/runs/{runId}/cancel:
+    post:
+      operationId: cancelRun
+      tags: [RunControl]
+      summary: Cancel an active run
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/runs/{runId}/retry:
+    post:
+      operationId: retryRun
+      tags: [RunControl]
+      summary: Retry failed run
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                override:
+                  type: object
+                  additionalProperties:
+                    type: [string, number, boolean, 'null']
+      responses:
+        '202':
+          $ref: '#/components/responses/RunAccepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/availability/targets:
+    get:
+      operationId: listTargetAvailability
+      tags: [Availability]
+      summary: List target liveness and readiness
+      responses:
+        '200':
+          $ref: '#/components/responses/AvailabilityListSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/identity/capability-tokens:
+    post:
+      operationId: mintCapabilityToken
+      tags: [IdentityTrustV2]
+      summary: Mint short-lived intent-scoped capability token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/capability-token.schema.json
+      responses:
+        '201':
+          $ref: '#/components/responses/CapabilityTokenCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/identity/capability-tokens/revoke:
+    post:
+      operationId: revokeCapabilityToken
+      tags: [IdentityTrustV2]
+      summary: Revoke capability token during task execution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/revocation.schema.json
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/identity/capability-tokens/{tokenId}/audit:
+    get:
+      operationId: getCapabilityTokenAudit
+      tags: [IdentityTrustV2]
+      summary: Fetch token decision/audit chain
+      parameters:
+        - in: path
+          name: tokenId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/CapabilityTokenSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/runs:plan:
+    post:
+      operationId: planRun
+      tags: [Negotiation]
+      summary: Generate dry run, explain, or clarification plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [capabilityId, negotiation]
+              properties:
+                capabilityId:
+                  type: string
+                negotiation:
+                  $ref: ../schemas/common/negotiation-hint.schema.json
+      responses:
+        '200':
+          $ref: '#/components/responses/RunPlanSuccess'
+        '400':
+          $ref: '#/components/responses/StructuredErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/runs/{runId}/pause:
+    post:
+      operationId: pauseRun
+      tags: [DurableExecution]
+      summary: Pause an active run and checkpoint state
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          $ref: '#/components/responses/WorkflowStateAccepted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/runs/{runId}/resume:
+    post:
+      operationId: resumeRun
+      tags: [DurableExecution]
+      summary: Resume a paused run from checkpoint
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/resume-token.schema.json
+      responses:
+        '202':
+          $ref: '#/components/responses/WorkflowStateAccepted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/runs/{runId}/checkpoints:
+    get:
+      operationId: listRunCheckpoints
+      tags: [DurableExecution]
+      summary: List replay-safe checkpoints for a run
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/CheckpointListSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/memory/records:
+    post:
+      operationId: writeMemoryRecord
+      tags: [Memory]
+      summary: Persist a managed memory record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/memory-record.schema.json
+      responses:
+        '201':
+          $ref: '#/components/responses/MemoryRecordCreated'
+        '400':
+          $ref: '#/components/responses/StructuredErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/memory/query:
+    post:
+      operationId: queryMemoryRecords
+      tags: [Memory]
+      summary: Query managed memory records
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId, query]
+              properties:
+                agentId:
+                  type: string
+                query:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/MemoryRecordListSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/memory/summarize:
+    post:
+      operationId: summarizeMemoryRecords
+      tags: [Memory]
+      summary: Summarize memory for long-horizon context
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentId]
+              properties:
+                agentId:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/MemorySummarySuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/memory/forget:
+    post:
+      operationId: forgetMemoryRecords
+      tags: [Memory]
+      summary: Remove memory records based on policy and scope
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [memoryIds]
+              properties:
+                memoryIds:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/usage/tasks/{taskId}:
+    get:
+      operationId: getTaskUsage
+      tags: [Accounting]
+      summary: Retrieve task usage in tokens, tool calls, and spend
+      parameters:
+        - in: path
+          name: taskId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/UsageMeterSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/budgets/allocate:
+    post:
+      operationId: allocateBudget
+      tags: [Accounting]
+      summary: Allocate token and tool call budgets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/budget-policy.schema.json
+      responses:
+        '201':
+          $ref: '#/components/responses/BudgetPolicyCreated'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/budgets/enforce:
+    post:
+      operationId: enforceBudget
+      tags: [Accounting]
+      summary: Enforce budget with model routing policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/model-routing-policy.schema.json
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/evals/run:
+    post:
+      operationId: runEval
+      tags: [ReasoningObservability]
+      summary: Execute an evaluation suite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [suiteId]
+              properties:
+                suiteId:
+                  type: string
+      responses:
+        '202':
+          $ref: '#/components/responses/EvalResultAccepted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/evals/{evalId}:
+    get:
+      operationId: getEvalResult
+      tags: [ReasoningObservability]
+      summary: Fetch evaluation result
+      parameters:
+        - in: path
+          name: evalId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/EvalResultSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/agents/{agentId}/messages:
+    post:
+      operationId: sendAgentMessage
+      tags: [AgentCoordination]
+      summary: Send an agent-to-agent message
+      parameters:
+        - in: path
+          name: agentId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/agent-message.schema.json
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/agents/{agentId}/handoff:
+    post:
+      operationId: handoffAgentTask
+      tags: [AgentCoordination]
+      summary: Handoff task control to another agent
+      parameters:
+        - in: path
+          name: agentId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/handoff.schema.json
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/agents/{agentId}/consensus:
+    post:
+      operationId: resolveAgentConsensus
+      tags: [AgentCoordination]
+      summary: Resolve shared decision among participating agents
+      parameters:
+        - in: path
+          name: agentId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/consensus-decision.schema.json
+      responses:
+        '200':
+          $ref: '#/components/responses/ConsensusDecisionSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/actions/propose:
+    post:
+      operationId: proposeAction
+      tags: [SandboxActuation]
+      summary: Propose side-effecting action under sandbox policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/side-effect-manifest.schema.json
+      responses:
+        '202':
+          $ref: '#/components/responses/ActionProposed'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/actions/{actionId}/approve:
+    post:
+      operationId: approveAction
+      tags: [SandboxActuation]
+      summary: Approve proposed action through gate controls
+      parameters:
+        - in: path
+          name: actionId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/approval-gate.schema.json
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/actions/{actionId}/apply:
+    post:
+      operationId: applyAction
+      tags: [SandboxActuation]
+      summary: Apply an approved action
+      parameters:
+        - in: path
+          name: actionId
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/actions/{actionId}/rollback:
+    post:
+      operationId: rollbackAction
+      tags: [SandboxActuation]
+      summary: Roll back side effects from an applied action
+      parameters:
+        - in: path
+          name: actionId
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/supervision/queue:
+    get:
+      operationId: listSupervisionQueue
+      tags: [Supervision]
+      summary: List approval and intervention queue items
+      responses:
+        '200':
+          $ref: '#/components/responses/SupervisionQueueSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/supervision/interventions:
+    post:
+      operationId: recordIntervention
+      tags: [Supervision]
+      summary: Record a human or agent supervisor intervention
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/common/intervention-record.schema.json
+      responses:
+        '201':
+          $ref: '#/components/responses/InterventionCreated'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/supervision/alerts:
+    get:
+      operationId: listDivergenceAlerts
+      tags: [Supervision]
+      summary: List divergence alerts against expected behavior
+      responses:
+        '200':
+          $ref: '#/components/responses/DivergenceAlertListSuccess'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v3/events:
+    post:
+      operationId: appendEvent
+      tags: [EventsProvenance]
+      summary: Append a unified provenance or reasoning event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/events/event-envelope.schema.json
+      responses:
+        '202':
+          $ref: '#/components/responses/AcceptedNoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    get:
+      operationId: listEvents
+      tags: [EventsProvenance]
+      summary: Query events by run and optional event type filter
+      parameters:
+        - in: query
+          name: runId
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: eventType
+          required: false
+          schema:
+            type: string
+            description: >-
+              Filter by eventType prefix or exact value (e.g. reasoning.node, tool.call,
+              journal.run.completed).
+      responses:
+        '200':
+          $ref: '#/components/responses/EventListSuccess'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    IdentitySession:
+      $ref: ../schemas/common/identity-session.schema.json
+    CapabilityListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: ../schemas/common/capability.schema.json
+    AvailabilityListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: ../schemas/common/availability.schema.json
+    EventListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: ../schemas/events/event-envelope.schema.json
+    StructuredError:
+      $ref: ../schemas/common/structured-error.schema.json
+    WorkflowState:
+      $ref: ../schemas/common/workflow-state.schema.json
+    CapabilityToken:
+      $ref: ../schemas/common/capability-token.schema.json
+    CheckpointListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: ../schemas/common/checkpoint.schema.json
+    MemoryRecordListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: ../schemas/common/memory-record.schema.json
+    MemorySummaryResponse:
+      type: object
+      required: [summary]
+      properties:
+        summary:
+          type: string
+    UsageMeter:
+      $ref: ../schemas/common/usage-meter.schema.json
+    EvalResult:
+      $ref: ../schemas/common/eval-result.schema.json
+    SupervisionQueueResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: ../schemas/common/supervision-queue-item.schema.json
+    DivergenceAlertListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: ../schemas/common/divergence-alert.schema.json
+    RunPlanResponse:
+      type: object
+      required: [negotiation, costLatencyHint]
+      properties:
+        negotiation:
+          $ref: ../schemas/common/negotiation-hint.schema.json
+        costLatencyHint:
+          $ref: ../schemas/common/cost-latency-hint.schema.json
+  responses:
+    CapabilityTokenCreated:
+      description: Capability token minted.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CapabilityToken'
+    CapabilityTokenSuccess:
+      description: Capability token details and audit context.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CapabilityToken'
+    RunPlanSuccess:
+      description: Run plan generated for negotiation mode.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RunPlanResponse'
+    WorkflowStateAccepted:
+      description: Workflow state transition accepted.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WorkflowState'
+    CheckpointListSuccess:
+      description: Checkpoint list.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CheckpointListResponse'
+    MemoryRecordCreated:
+      description: Memory record persisted.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/memory-record.schema.json
+    MemoryRecordListSuccess:
+      description: Memory query results.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MemoryRecordListResponse'
+    MemorySummarySuccess:
+      description: Summarized memory context.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MemorySummaryResponse'
+    UsageMeterSuccess:
+      description: Usage meter.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UsageMeter'
+    BudgetPolicyCreated:
+      description: Budget policy allocated.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/budget-policy.schema.json
+    EvalResultAccepted:
+      description: Eval run accepted.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EvalResult'
+    EvalResultSuccess:
+      description: Eval result.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EvalResult'
+    ConsensusDecisionSuccess:
+      description: Consensus decision result.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/consensus-decision.schema.json
+    ActionProposed:
+      description: Action proposal accepted for sandbox gating.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/side-effect-manifest.schema.json
+    SupervisionQueueSuccess:
+      description: Supervision queue listing.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SupervisionQueueResponse'
+    InterventionCreated:
+      description: Intervention record stored.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/intervention-record.schema.json
+    DivergenceAlertListSuccess:
+      description: Divergence alerts.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DivergenceAlertListResponse'
+    EventListSuccess:
+      description: Unified event stream (journal, run lifecycle, policy, reasoning, tool calls).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EventListResponse'
+    IdentitySessionSuccess:
+      description: Session established with delegation claims.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/IdentitySession'
+    CapabilityListSuccess:
+      description: Capability list.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CapabilityListResponse'
+    CapabilityCreated:
+      description: Capability registered.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/capability.schema.json
+    CapabilitySuccess:
+      description: Capability details.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/capability.schema.json
+    PolicyDecisionSuccess:
+      description: Policy decision result.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/policy-decision.schema.json
+    RunAccepted:
+      description: Run accepted for execution.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/run.schema.json
+    RunSuccess:
+      description: Run details.
+      content:
+        application/json:
+          schema:
+            $ref: ../schemas/common/run.schema.json
+    AvailabilityListSuccess:
+      description: Availability list.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AvailabilityListResponse'
+    AcceptedNoContent:
+      description: Request accepted for asynchronous processing.
+    StructuredErrorBadRequest:
+      description: Structured error with recovery metadata.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StructuredError'
+    BadRequest:
+      description: Request validation failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StructuredError'
+    Unauthorized:
+      description: Missing or invalid authentication credentials.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StructuredError'
+    NotFound:
+      description: Requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StructuredError'
+    Forbidden:
+      description: Authenticated but not authorized for requested action.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StructuredError'
+    Conflict:
+      description: Request conflicts with current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StructuredError'
+    InternalError:
+      description: Unexpected internal service error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StructuredError'
+tags:
+  - name: IdentityTrust
+    description: Session bootstrap and delegation claims (establishSession).
+  - name: IdentityTrustV2
+    description: Capability-scoped identity, delegation intent, and revocation.
+  - name: CapabilityRegistry
+    description: Capability registration, discovery, and artifact metadata contracts.
+  - name: RunControl
+    description: Submission, lifecycle, cancellation, retry, negotiation, and durable execution.
+  - name: PolicyDecision
+    description: Policy evaluation contracts and obligation semantics.
+  - name: Availability
+    description: Target liveness, readiness, and scheduling signal contracts.
+  - name: EventsProvenance
+    description: Unified append/query event stream (journal lineage, reasoning, tool calls).
+  - name: Negotiation
+    description: Dry run, explain, and clarification-first request planning.
+  - name: DurableExecution
+    description: Pause, resume, and replay-safe checkpoint lifecycle operations.
+  - name: Memory
+    description: Managed memory tier for retention, summarization, and forgetting.
+  - name: Accounting
+    description: Token and tool-call budgeting, usage, and routing policy controls.
+  - name: ReasoningObservability
+    description: Reasoning graph events and evaluation lifecycle contracts.
+  - name: AgentCoordination
+    description: Agent messaging, handoff, and consensus decision contracts.
+  - name: SandboxActuation
+    description: Sandboxed proposals, approval gates, apply, and rollback controls.
+  - name: Supervision
+    description: Human and agent supervisor queue, alerting, and interventions.

@@ -1,0 +1,15 @@
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example",
+  "expiresIn": 3600,
+  "claims": {
+    "principalId": "principal_01",
+    "workloadId": "workload_01",
+    "delegationChain": [
+      {
+        "actor": "gateway.prod",
+        "issuedAt": "2026-04-29T12:00:00Z",
+        "scope": "gmp.run.submit"
+      }
+    ]
+  }
+}

@@ -3,7 +3,7 @@
   "$id": "https://gmp.dev/contracts/schemas/events/run-lifecycle-event.schema.json",
   "title": "RunLifecycleEvent",
   "allOf": [
-    { "$ref": "./event-envelope.schema.json" },
+    { "$ref": "./event-envelope-base.schema.json" },
     {
       "type": "object",
       "properties": {
