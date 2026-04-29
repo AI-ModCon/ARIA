@@ -11,16 +11,29 @@ This directory defines the **Genesis Mission Platform (GMP) core-v3** contract b
 - [fixtures/v3/](fixtures/v3/): Machine-validated example payloads for the validator.
 - [v3-design-notes.md](v3-design-notes.md): Unification decisions (identity, runs, errors, events).
 - [v3-release-governance.md](v3-release-governance.md): Stub release and GA policy (expand with real thresholds later).
+- [archive/v1/](archive/v1/) and [archive/v2/](archive/v2/): Historical OpenAPI, profiles, fixtures, and v2 migration/governance docs (not part of the active conformance line).
 
-## v3 surface (conceptual)
+## v3 API surface (aligned with OpenAPI tags)
 
-1. **Identity**: `establishSession`, capability token mint/revoke/audit.
-2. **Capability registry**: list, register, get.
-3. **Policy**: `evaluatePolicy`.
-4. **Runs**: `planRun`, `submitRun`, `getRun`, `cancelRun`, `retryRun`, `pauseRun`, `resumeRun`, `listRunCheckpoints`.
-5. **Availability**: list targets.
-6. **Events**: `appendEvent`, `listEvents` (journal lineage as `journal.*` types, reasoning and tool calls in the same stream).
-7. **Memory, accounting, evals, agents, actions, supervision**: unchanged intent from v2 paths, now under `/v3/...`.
+All paths are under `/v3/...`. Operation IDs below match [profiles/core-v3.json](profiles/core-v3.json) `requiredOperations` and [openapi/gmp-core-v3.yaml](openapi/gmp-core-v3.yaml).
+
+| Tag | Operations |
+| --- | --- |
+| **IdentityTrust** | `establishSession` |
+| **IdentityTrustV2** | `mintCapabilityToken`, `revokeCapabilityToken`, `getCapabilityTokenAudit` |
+| **CapabilityRegistry** | `listCapabilities`, `registerCapability`, `getCapability` |
+| **PolicyDecision** | `evaluatePolicy` |
+| **RunControl** | `submitRun`, `getRun`, `cancelRun`, `retryRun` |
+| **Negotiation** | `planRun` |
+| **DurableExecution** | `pauseRun`, `resumeRun`, `listRunCheckpoints` |
+| **Availability** | `listTargetAvailability` |
+| **Memory** | `writeMemoryRecord`, `queryMemoryRecords`, `summarizeMemoryRecords`, `forgetMemoryRecords` |
+| **Accounting** | `getTaskUsage`, `allocateBudget`, `enforceBudget` |
+| **ReasoningObservability** | `runEval`, `getEvalResult` |
+| **AgentCoordination** | `sendAgentMessage`, `handoffAgentTask`, `resolveAgentConsensus` |
+| **SandboxActuation** | `proposeAction`, `approveAction`, `applyAction`, `rollbackAction` |
+| **Supervision** | `listSupervisionQueue`, `recordIntervention`, `listDivergenceAlerts` |
+| **EventsProvenance** | `appendEvent`, `listEvents` (unified stream: journal-style `journal.*`, reasoning, tool calls) |
 
 ## What changed from v1 / v2
 
@@ -47,7 +60,8 @@ A deployment is **core-v3** compatible when:
 2. Every `requiredOperations` entry in [core-v3.json](profiles/core-v3.json) is implemented.
 3. Every `requiredSchemas` file exists and validates.
 4. Failure taxonomy stays consistent across run, journal, and event payloads.
-5. Fixture validation passes: `make validate-v3-contracts`.
+5. Fixture validation passes: `make validate-v3-contracts` (from repo root; runs [scripts/validate_v3_contracts.py](../scripts/validate_v3_contracts.py)).
+6. Profile `complianceChecks` in [core-v3.json](profiles/core-v3.json) (identity revocation, idempotency, durable execution, memory/budget policy, reasoning trace, sandbox gates, supervision) are satisfied by the deployment’s behavior and tests—expand coverage as implementations land.
 
 ## Extension policy
 
