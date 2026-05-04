@@ -19,7 +19,8 @@
             "evidenceRefs": {
               "type": "array",
               "items": { "type": "string", "format": "uri" }
-            }
+            },
+            "uncertainty": { "$ref": "../common/uncertainty.schema.json" }
           },
           "additionalProperties": false
         }

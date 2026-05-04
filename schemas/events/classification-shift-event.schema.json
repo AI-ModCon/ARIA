@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/events/classification-shift-event.schema.json",
+  "title": "ClassificationShiftEvent",
+  "description": "Emitted when operational classification or AI RMF-aligned risk tier changes mid-run (e.g. sensitive intermediate output); consumers should pause/re-evaluate policy and supervision.",
+  "allOf": [
+    { "$ref": "./event-envelope-base.schema.json" },
+    {
+      "type": "object",
+      "properties": {
+        "eventType": {
+          "type": "string",
+          "enum": ["classification.shift"]
+        },
+        "payload": {
+          "type": "object",
+          "required": ["runId", "previousClassificationLabel", "newClassificationLabel", "rationaleCode"],
+          "properties": {
+            "runId": { "type": "string", "minLength": 1 },
+            "previousClassificationLabel": { "type": "string", "minLength": 1 },
+            "newClassificationLabel": { "type": "string", "minLength": 1 },
+            "rationaleCode": { "type": "string", "minLength": 1 },
+            "triggeringArtifactUri": { "type": "string", "format": "uri" },
+            "requiresReauthorization": { "type": "boolean", "default": true }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["eventType", "payload"]
+    }
+  ]
+}

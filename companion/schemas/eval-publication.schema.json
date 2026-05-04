@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/companion/schemas/eval-publication.schema.json",
+  "title": "EvalPublication",
+  "description": "Metadata for publishing or registering evaluation outcomes (e.g. leaderboard rows) tied to spine eval APIs.",
+  "type": "object",
+  "required": ["publicationId", "suiteIds", "visibility"],
+  "properties": {
+    "publicationId": { "type": "string", "minLength": 1 },
+    "suiteIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "evalIds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "visibility": { "type": "string", "enum": ["internal", "partner", "public_metadata_only", "public_full"] },
+    "codeArtifactUri": { "type": "string", "format": "uri" },
+    "scorecardUri": { "type": "string", "format": "uri" },
+    "relatedRunIds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

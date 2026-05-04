@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/companion/schemas/data-movement-intent.schema.json",
+  "title": "DataMovementIntent",
+  "description": "Declarative staging or replication intent; mover capabilities interpret and execute against site policy.",
+  "type": "object",
+  "required": ["intentId", "source", "sink"],
+  "properties": {
+    "intentId": { "type": "string", "minLength": 1 },
+    "source": {
+      "type": "object",
+      "required": ["uri"],
+      "properties": {
+        "uri": { "type": "string", "format": "uri" },
+        "datasetId": { "type": "string" },
+        "datasetVersion": { "type": "string" },
+        "localityHint": { "type": "string", "enum": ["origin_only", "compute_near_data", "replicate_mirror", "neutral"] }
+      },
+      "additionalProperties": false
+    },
+    "sink": {
+      "type": "object",
+      "required": ["uri"],
+      "properties": {
+        "uri": { "type": "string", "format": "uri" },
+        "datasetId": { "type": "string" },
+        "datasetVersion": { "type": "string" },
+        "localityHint": { "type": "string", "enum": ["origin_only", "compute_near_data", "replicate_mirror", "neutral"] }
+      },
+      "additionalProperties": false
+    },
+    "transferMode": { "type": "string", "enum": ["copy", "sync", "link_only", "stage_then_verify"] },
+    "policyTags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "relatedRunId": { "type": "string", "description": "Optional spine run correlation." }
+  },
+  "additionalProperties": false
+}

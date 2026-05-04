@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/common/uncertainty.schema.json",
+  "title": "Uncertainty",
+  "description": "Optional interoperable uncertainty or confidence hints for evaluation and reasoning artefacts.",
+  "type": "object",
+  "properties": {
+    "basis": { "type": "string", "minLength": 1, "description": "Calibration basis, methodology label, or evidence pointer." },
+    "scalarConfidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "distributionType": {
+      "type": "string",
+      "enum": ["none", "epistemic_interval", "aleatoric_variance", "categorical_mass", "ensemble_spread"]
+    },
+    "abstainRecommended": { "type": "boolean", "description": "When true, downstream policy may require human escalation." }
+  },
+  "additionalProperties": false
+}

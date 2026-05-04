@@ -9,6 +9,12 @@
     "nodeId": "node_002",
     "parentNodeId": "node_001",
     "decision": "request_human_approval",
-    "evidenceRefs": ["https://evidence.example/orders/order_4451"]
+    "evidenceRefs": ["https://evidence.example/orders/order_4451"],
+    "uncertainty": {
+      "basis": "calibrator_v2_holdout_set",
+      "scalarConfidence": 0.71,
+      "distributionType": "epistemic_interval",
+      "abstainRecommended": false
+    }
   }
 }

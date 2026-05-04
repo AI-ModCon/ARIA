@@ -1,6 +1,8 @@
 {
   "capabilityId": "cap.simulation.kolmogorov.v1",
   "planId": "plan_01JYV6HEP9V0M2B8Q62J4AYM4D",
+  "planRef": "https://plans.example/org/campaigns/plan_01JYV6HEP9V0M2B8Q62J4AYM4D.json",
+  "planDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "executionContext": {
     "configHash": "a3e5d2571606f4f8a13f0f248f54f4e35f3e7f56d76d5f7c7a82f5f6567a0f84",
     "environmentHash": "c3f7af31a1722ea9639f99d75cf4228fa30f7ec398bd6111f0cc4dbf19773621",

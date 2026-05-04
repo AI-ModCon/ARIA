@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/companion/schemas/campaign-plan.schema.json",
+  "title": "CampaignPlan",
+  "description": "Portable typed graph for multi-step agent campaigns; stored or exchanged as an artifact and referenced opaquely from the spine Run.",
+  "type": "object",
+  "required": ["planId", "schemaVersion", "nodes"],
+  "properties": {
+    "planId": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "type": "string", "minLength": 1, "description": "Semantic version of this CampaignPlan JSON shape." },
+    "title": { "type": "string" },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["nodeId"],
+        "properties": {
+          "nodeId": { "type": "string", "minLength": 1 },
+          "label": { "type": "string" },
+          "capabilityId": { "type": "string", "description": "Spine capability identifier when this node maps to a registered capability." },
+          "artifactRef": { "type": "string", "format": "uri", "description": "URI to capability implementation or subgraph details." },
+          "approvalGateId": { "type": "string", "description": "Logical gate identifier for HITL or policy checkpoints." },
+          "metadata": { "type": "object", "additionalProperties": true }
+        },
+        "additionalProperties": false
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["fromNodeId", "toNodeId"],
+        "properties": {
+          "fromNodeId": { "type": "string", "minLength": 1 },
+          "toNodeId": { "type": "string", "minLength": 1 },
+          "edgeKind": { "type": "string", "enum": ["sequential", "conditional", "feedback"] },
+          "conditionLabel": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "defaultApprovalGateIds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "additionalProperties": false
+}

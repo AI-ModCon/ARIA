@@ -10,7 +10,13 @@
     "status": { "type": "string", "enum": ["running", "paused", "resumable", "completed", "failed"] },
     "updatedAt": { "type": "string", "format": "date-time" },
     "inputSnapshotHash": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
-    "toolResultHash": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" }
+    "toolResultHash": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+    "riskTierLabel": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operational risk or classification tier label after last policy evaluation (sites define vocabulary)."
+    },
+    "riskTierVersion": { "type": "string", "minLength": 1, "description": "Version or hash of the risk taxonomy used with riskTierLabel." }
   },
   "additionalProperties": false
 }

@@ -19,6 +19,19 @@
     "reproducibilityTier": {
       "type": "string",
       "enum": ["tier1_declared", "tier2_smoke_tested", "tier3_independently_replicated"]
+    },
+    "accessPrerequisites": {
+      "description": "Licensing, export-control, citizenship, embargo, or agreement metadata enforced at invocation; mirrors DatasetRef parity.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "value"],
+        "properties": {
+          "type": { "type": "string", "enum": ["license", "citizenship", "training", "embargo", "agreement"] },
+          "value": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "additionalProperties": false

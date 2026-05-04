@@ -27,5 +27,13 @@ This document records the unification decisions for **core-v3**: a single OpenAP
 ## Cross-cutting policies
 
 - **Extensions**: `core-v3.json` `extensionPolicy` requires `x-gmp-*` fields or routes under `/v3/experimental/*` for non-core extensions. The core OpenAPI document does not define experimental operations; implementations reserve that namespace for graduation from experiments to core.
+
+### Campaign plans and portability
+
+Spine Runs may reference an externally stored **CampaignPlan** JSON artefact (`planRef`, `planDigest`) defined under [companion/schemas/campaign-plan.schema.json](companion/schemas/campaign-plan.schema.json). This keeps orchestration semantics portable without expanding `planRun`'s synchronous response into a full graph schema.
+
+### Mid-run classification shifts
+
+Deployments may emit `classification.shift` events (see [schemas/events/classification-shift-event.schema.json](schemas/events/classification-shift-event.schema.json)) alongside existing envelope variants so observability tooling can correlate tier changes with `pauseRun`, supervision queues, and new policy evaluations.
 - **Idempotency**: Profile check `idempotency_required_on_mutations` is carried from v2. `submitRun` carries `idempotencyKey` in the request body; other mutating operations should require an `Idempotency-Key` header (to be tightened in OpenAPI operation parameters in a follow-up pass if desired).
 - **Failure taxonomy**: A single F0–F8 taxonomy is used across runs, legacy journal payloads, and envelope payloads.

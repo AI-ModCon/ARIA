@@ -1,0 +1,10 @@
+{
+  "publicationId": "pub_01HZZMEVALSAMPLE",
+  "suiteIds": ["suite_dof_combustion_bench_v3"],
+  "evalIds": ["eval_9f2aac10"],
+  "visibility": "public_metadata_only",
+  "codeArtifactUri": "https://code.example.gov/genesis/workflows/combustion-bench/tag/v1.0.0",
+  "scorecardUri": "https://leaderboard.example.gov/entries/pub_01HZZMEVALSAMPLE",
+  "relatedRunIds": ["run_01K3RUN0001"],
+  "notes": "Example publication record for conformance fixtures."
+}

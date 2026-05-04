@@ -1,0 +1,15 @@
+{
+  "eventId": "evt_class_shift_01",
+  "eventType": "classification.shift",
+  "occurredAt": "2026-04-30T12:00:00Z",
+  "source": "policy.runtime.gmp",
+  "correlationId": "run_01K3RUN0001",
+  "payload": {
+    "runId": "run_01K3RUN0001",
+    "previousClassificationLabel": "controlled_unclassified",
+    "newClassificationLabel": "cui_sensitive",
+    "rationaleCode": "INTERMEDIATE_OUTPUT_CUI_DETECTED",
+    "triggeringArtifactUri": "https://artifacts.example/runs/run_01K3RUN0001/outputs/compound.tsv",
+    "requiresReauthorization": true
+  }
+}

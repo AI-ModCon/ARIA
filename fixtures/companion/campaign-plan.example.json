@@ -1,0 +1,26 @@
+{
+  "planId": "plan_01JYV6HEP9V0M2B8Q62J4AYM4D",
+  "schemaVersion": "1.0.0",
+  "title": "Synthetic validation campaign",
+  "nodes": [
+    {
+      "nodeId": "n1",
+      "label": "Simulate",
+      "capabilityId": "cap.simulation.kolmogorov.v1"
+    },
+    {
+      "nodeId": "n2",
+      "label": "Analyze",
+      "capabilityId": "cap.analysis.surrogate.v2",
+      "approvalGateId": "gate_hitl_01"
+    }
+  ],
+  "edges": [
+    {
+      "fromNodeId": "n1",
+      "toNodeId": "n2",
+      "edgeKind": "sequential"
+    }
+  ],
+  "defaultApprovalGateIds": ["gate_hitl_01"]
+}

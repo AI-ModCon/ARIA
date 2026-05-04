@@ -2,6 +2,25 @@
 
 This directory defines the **Genesis Mission Platform (GMP) core-v3** contract baseline: one OpenAPI surface under `/v3/...` that unifies the former operational backbone (`core-v1`) and agent-native line (`core-v2`). Historical specs are preserved under [archive/v1/](archive/v1/) and [archive/v2/](archive/v2/).
 
+## Spine charter
+
+**Core v3 is intentionally a spine**, not a single universal integration contract for every scientific workflow surface. Scope: an **agent-first, AI-native** control plane that **interoperates across the enterprise** via stable identity, policy, governed execution, provenance-style events, and capability registration—not via encoding full data meshes, leaderboard products, OCR pipelines, or facility-specific transports inside this OpenAPI document alone.
+
+What the spine **does** guarantee (implementations must conform to [profiles/core-v3.json](profiles/core-v3.json)):
+
+- Session bootstrap and **scoped, revocable** capability delegation (`establishSession`, capability tokens).
+- **Capability registry** and **single Run** abstraction with execution context hashes, optional **plan linkage** (opaque reference + digest to companion plan artifacts).
+- **Policy evaluation**, **sandboxed actuation**, **supervision**, and a **unified event stream** for audit and reasoning tooling.
+- **Durable execution** (pause, resume, checkpoints) and operational **budget / routing hints** adjacent to accounting.
+
+What the spine **does not** require (belongs to **companion schemas**, capabilities, MCP servers, deployment planes, or program-specific APIs unless adopted into an optional profile):
+
+- Full Globus/catalog/data-plane operation sets, multimodal ingestion, OCR stacks, leaderboard portals as core paths.
+- Typed multi-step **campaign graphs** themselves (use [companion/](companion/README.md) `CampaignPlan` and link from `planRef` / `planDigest`).
+- Low-latency streaming channels (document in design notes / edge deployments; correlate with existing `correlationId` / `runId`).
+
+Demand-side analyses that score “gaps versus v3” should be read with this charter: gaps are often **outside spine GA** while still **tracked** in [GAP_DISPOSITION_REGISTER.md](GAP_DISPOSITION_REGISTER.md).
+
 ## Structure
 
 - [openapi/gmp-core-v3.yaml](openapi/gmp-core-v3.yaml): Unified REST API (sessions, registry, policy, runs, availability, events, capability tokens, negotiation, durable execution, memory, accounting, evals, coordination, sandbox, supervision).
@@ -9,6 +28,8 @@ This directory defines the **Genesis Mission Platform (GMP) core-v3** contract b
 - [schemas/common/](schemas/common/): Shared object schemas.
 - [schemas/events/](schemas/events/): Event taxonomy, [event-envelope-base.schema.json](schemas/events/event-envelope-base.schema.json), discriminated [event-envelope.schema.json](schemas/events/event-envelope.schema.json), and specializations.
 - [fixtures/v3/](fixtures/v3/): Machine-validated example payloads for the validator.
+- [companion/](companion/README.md): Optional interoperability schemas (`CampaignPlan`, `DataMovementIntent`, `EvalPublication`) for enterprises that adopt the **core-v3-companion** bundle (see [profiles/core-v3-companion.json](profiles/core-v3-companion.json)).
+- [GAP_DISPOSITION_REGISTER.md](GAP_DISPOSITION_REGISTER.md): Maps consolidated workflow themes to spine vs companion vs capability disposition.
 - [v3-design-notes.md](v3-design-notes.md): Unification decisions (identity, runs, errors, events).
 - [v3-release-governance.md](v3-release-governance.md): Stub release and GA policy (expand with real thresholds later).
 - [archive/v1/](archive/v1/) and [archive/v2/](archive/v2/): Historical OpenAPI, profiles, fixtures, and v2 migration/governance docs (not part of the active conformance line).

@@ -10,7 +10,8 @@
     "status": { "type": "string", "enum": ["running", "passed", "failed"] },
     "score": { "type": "number", "minimum": 0 },
     "createdAt": { "type": "string", "format": "date-time" },
-    "notes": { "type": "string" }
+    "notes": { "type": "string" },
+    "uncertainty": { "$ref": "./uncertainty.schema.json" }
   },
   "additionalProperties": false
 }

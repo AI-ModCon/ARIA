@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: GMP Core API
-  version: 3.0.0
+  version: 3.0.1
   description: >-
     Genesis Mission Platform v3 unified API: operational backbone (sessions, capability
     registry, policy, run lifecycle, availability, events) plus agent-native identity,
@@ -171,6 +171,14 @@ paths:
                 planId:
                   type: string
                   description: Optional plan identifier from POST /v3/runs:plan
+                planRef:
+                  type: string
+                  format: uri
+                  description: URI of companion CampaignPlan artifact when linkage is opaque to negotiation flow
+                planDigest:
+                  type: string
+                  pattern: '^[a-fA-F0-9]{64}$'
+                  description: SHA-256 hex digest of canonical CampaignPlan bytes at planRef
                 executionContext:
                   $ref: ../schemas/common/execution-context.schema.json
                 idempotencyKey:

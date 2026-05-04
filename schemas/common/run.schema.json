@@ -32,6 +32,16 @@
       "enum": ["F0_NONE", "F1_MISSING_ARTIFACT", "F2_ENVIRONMENT", "F3_DATA_ACCESS", "F4_POLICY", "F5_UNSPECIFIED_CONFIG", "F6_HPC_QUEUE", "F7_RUNTIME", "F8_DOMAIN_ASSUMPTION"]
     },
     "planId": { "type": "string", "description": "Optional plan identifier returned by POST /v3/runs:plan when negotiation preflight was used." },
+    "planRef": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI of a CampaignPlan artefact when using companion plan schema; opaque to orchestrators that emit only planId."
+    },
+    "planDigest": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$",
+      "description": "SHA-256 hex digest over the canonical CampaignPlan bytes referenced by planRef."
+    },
     "currentCheckpointId": { "type": "string", "description": "Latest durable checkpoint for this run, if any." },
     "workflowState": { "$ref": "./workflow-state.schema.json" }
   },

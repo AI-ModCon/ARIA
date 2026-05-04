@@ -1,0 +1,16 @@
+{
+  "intentId": "move_01HZZM7SAMPLE",
+  "source": {
+    "uri": "https://data.example.lab/datasets/fusion/run-42/",
+    "datasetId": "ds_fusion_42",
+    "datasetVersion": "2026.04",
+    "localityHint": "origin_only"
+  },
+  "sink": {
+    "uri": "https://staging.example.org/campaigns/2026-04/fusion/",
+    "localityHint": "compute_near_data"
+  },
+  "transferMode": "stage_then_verify",
+  "policyTags": ["controlled_unclassified"],
+  "relatedRunId": "run_01K3RUN0001"
+}

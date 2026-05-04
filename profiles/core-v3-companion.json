@@ -1,7 +1,7 @@
 {
-  "profileId": "core-v3",
+  "profileId": "core-v3-companion",
   "version": "3.0.1",
-  "description": "Mandatory GMP core profile for v3 unified deployments (operational backbone + agent-native surface).",
+  "description": "Optional bundle: mandates spine core-v3 artefacts plus CampaignPlan / DataMovementIntent / EvalPublication companion JSON Schemas for cross-enterprise interoperability.",
   "requiredApiSpec": "../openapi/gmp-core-v3.yaml",
   "requiredOperations": [
     "establishSession",
@@ -70,7 +70,6 @@
     "../schemas/common/budget-policy.schema.json",
     "../schemas/common/model-routing-policy.schema.json",
     "../schemas/common/eval-result.schema.json",
-    "../schemas/common/uncertainty.schema.json",
     "../schemas/common/agent-message.schema.json",
     "../schemas/common/handoff.schema.json",
     "../schemas/common/consensus-decision.schema.json",
@@ -80,6 +79,7 @@
     "../schemas/common/supervision-queue-item.schema.json",
     "../schemas/common/divergence-alert.schema.json",
     "../schemas/common/intervention-record.schema.json",
+    "../schemas/common/uncertainty.schema.json",
     "../schemas/events/failure-taxonomy.schema.json",
     "../schemas/events/event-envelope-base.schema.json",
     "../schemas/events/event-envelope.schema.json",
@@ -88,7 +88,10 @@
     "../schemas/events/policy-check-event.schema.json",
     "../schemas/events/reasoning-node-event.schema.json",
     "../schemas/events/tool-call-event.schema.json",
-    "../schemas/events/classification-shift-event.schema.json"
+    "../schemas/events/classification-shift-event.schema.json",
+    "../companion/schemas/campaign-plan.schema.json",
+    "../companion/schemas/data-movement-intent.schema.json",
+    "../companion/schemas/eval-publication.schema.json"
   ],
   "reproducibilityTiers": {
     "tier1_declared": {
@@ -116,6 +119,7 @@
     "sandbox_gate_apply_rollback_validated",
     "supervision_workflows_validated"
   ],
+  "extendsProfileId": "core-v3",
   "extensionPolicy": {
     "allowed": true,
     "namespaceRule": "Extensions must use x-gmp-* fields or /v3/experimental/* routes.",

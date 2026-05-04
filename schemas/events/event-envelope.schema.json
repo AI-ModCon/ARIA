@@ -8,6 +8,7 @@
     { "$ref": "./policy-check-event.schema.json" },
     { "$ref": "./reasoning-node-event.schema.json" },
     { "$ref": "./tool-call-event.schema.json" },
-    { "$ref": "./journal-envelope-event.schema.json" }
+    { "$ref": "./journal-envelope-event.schema.json" },
+    { "$ref": "./classification-shift-event.schema.json" }
   ]
 }
