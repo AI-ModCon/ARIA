@@ -29,6 +29,7 @@ Demand-side analyses that score “gaps versus v3” should be read with this ch
 - [schemas/events/](schemas/events/): Event taxonomy, [event-envelope-base.schema.json](schemas/events/event-envelope-base.schema.json), discriminated [event-envelope.schema.json](schemas/events/event-envelope.schema.json), and specializations.
 - [fixtures/v3/](fixtures/v3/): Machine-validated example payloads for the validator.
 - [companion/](companion/README.md): Optional interoperability schemas (`CampaignPlan`, `DataMovementIntent`, `EvalPublication`) for enterprises that adopt the **core-v3-companion** bundle (see [profiles/core-v3-companion.json](profiles/core-v3-companion.json)).
+- [rfcs/](rfcs/README.md): Draft RFCs for contract changes (platform alignment and related proposals).
 - [GAP_DISPOSITION_REGISTER.md](GAP_DISPOSITION_REGISTER.md): Maps consolidated workflow themes to spine vs companion vs capability disposition.
 - [v3-design-notes.md](v3-design-notes.md): Unification decisions (identity, runs, errors, events).
 - [v3-release-governance.md](v3-release-governance.md): Stub release and GA policy (expand with real thresholds later).
