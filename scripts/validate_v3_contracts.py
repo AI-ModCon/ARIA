@@ -378,6 +378,7 @@ def main() -> int:
         ("campaign-plan.example.json", companion_schema_dir / "campaign-plan.schema.json"),
         ("data-movement-intent.example.json", companion_schema_dir / "data-movement-intent.schema.json"),
         ("eval-publication.example.json", companion_schema_dir / "eval-publication.schema.json"),
+        ("run-invocation.example.json", companion_schema_dir / "run-invocation.schema.json"),
     ]
     if not FIXTURES_COMPANION.exists():
         errors.append(f"Missing companion fixtures directory: {FIXTURES_COMPANION}")

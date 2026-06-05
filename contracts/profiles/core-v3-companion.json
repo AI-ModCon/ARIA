@@ -91,7 +91,8 @@
     "../schemas/events/classification-shift-event.schema.json",
     "../companion/schemas/campaign-plan.schema.json",
     "../companion/schemas/data-movement-intent.schema.json",
-    "../companion/schemas/eval-publication.schema.json"
+    "../companion/schemas/eval-publication.schema.json",
+    "../companion/schemas/run-invocation.schema.json"
   ],
   "reproducibilityTiers": {
     "tier1_declared": {

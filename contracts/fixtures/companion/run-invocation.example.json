@@ -1,0 +1,53 @@
+{
+  "contextHash": "a3e5d2571606f4f8a13f0f248f54f4e35f3e7f56d76d5f7c7a82f5f6567a0f84",
+  "inputs": {
+    "model": "claude-sonnet-4",
+    "system": "You are a fluid-dynamics simulation assistant.",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Run a Kolmogorov flow simulation at Reynolds number 1000 and report the energy spectrum."
+      }
+    ],
+    "tools": [
+      {
+        "name": "run_simulation",
+        "description": "Execute a registered HPC simulation capability.",
+        "input_schema": {
+          "type": "object",
+          "required": ["capabilityId", "reynolds"],
+          "properties": {
+            "capabilityId": { "type": "string" },
+            "reynolds": { "type": "number" }
+          }
+        }
+      }
+    ]
+  },
+  "parameters": {
+    "model": "claude-sonnet-4",
+    "system": "You are a fluid-dynamics simulation assistant.",
+    "temperature": 0,
+    "max_tokens": 1024
+  },
+  "outputs": {
+    "content": "I'll run the Kolmogorov flow simulation now.",
+    "tool_calls": [
+      {
+        "id": "toolu_01A9F2C3D4E5",
+        "name": "run_simulation",
+        "input": {
+          "capabilityId": "cap.simulation.kolmogorov.v1",
+          "reynolds": 1000
+        }
+      }
+    ],
+    "usage": {
+      "input_tokens": 312,
+      "output_tokens": 47
+    },
+    "finish_reason": "tool_calls",
+    "model": "claude-sonnet-4",
+    "provider": "anthropic"
+  }
+}
