@@ -4,12 +4,12 @@
   "title": "RunInvocation",
   "description": "Optional companion artefact that records the model-agnostic invocation inputs/parameters and outputs (including MAG tool_calls) behind a spine ExecutionContext. The spine Run carries reproducibility hashes only; deployments that need to persist or exchange the literal request/response payload reference this artefact by its contextHash. See run-invocation-interop.md for OpenAI/Anthropic mapping and MAG normalization rules.",
   "type": "object",
-  "required": ["contextHash"],
+  "required": ["contextHash", "inputs"],
   "properties": {
     "contextHash": {
       "type": "string",
-      "minLength": 1,
-      "description": "Reproducibility hash that ties this invocation record to a spine ExecutionContext. Equal to execution-context.schema.json#configHash when a single canonical hash is used; otherwise an opaque digest agreed by orchestrator and platform."
+      "pattern": "^[a-fA-F0-9]{32}([a-fA-F0-9]{32})?$",
+      "description": "Opaque reproducibility digest that ties this invocation record to a spine ExecutionContext. It may equal execution-context.schema.json#configHash when a canonical 64-hex hash is used, or a platform-defined 32-hex digest when documented by the implementation profile."
     },
     "inputs": {
       "type": "object",
@@ -35,7 +35,8 @@
                 "enum": ["system", "user", "assistant", "tool"]
               },
               "content": {
-                "description": "String content, or a list of typed content blocks (text/tool_use/tool_result) after MAG normalization."
+                "description": "String content, or a list of typed content blocks (text/tool_use/tool_result) after MAG normalization.",
+                "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "object", "additionalProperties": true } }]
               },
               "name": { "type": "string" },
               "tool_call_id": {
@@ -96,17 +97,19 @@
       "description": "Normalized response payload returned by the MAG. tool_calls is the canonical, provider-agnostic representation of model-requested tool invocations.",
       "properties": {
         "content": {
-          "description": "Assistant content: a string, or a list of typed content blocks after MAG normalization."
+          "description": "Assistant content: a string, or a list of typed content blocks after MAG normalization.",
+          "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "object", "additionalProperties": true } }]
         },
         "tool_calls": {
           "type": "array",
           "description": "Model-requested tool invocations as [{ id, name, input }]. OpenAI tool_calls[].function.{name,arguments} and Anthropic tool_use blocks {id,name,input} are normalized to this shape; arguments JSON strings are parsed into input objects.",
           "items": {
             "type": "object",
-            "required": ["name"],
+            "required": ["id", "name", "input"],
             "properties": {
               "id": {
                 "type": "string",
+                "minLength": 1,
                 "description": "Provider-assigned identifier for this tool call, echoed back on the corresponding role=tool result via tool_call_id."
               },
               "name": {
@@ -115,7 +118,9 @@
                 "description": "Tool name; must match a tools[].name advertised in inputs."
               },
               "input": {
-                "description": "Decoded tool arguments object (already parsed from any provider-specific JSON string encoding)."
+                "type": "object",
+                "description": "Decoded tool arguments object (already parsed from any provider-specific JSON string encoding).",
+                "additionalProperties": true
               }
             },
             "additionalProperties": false
