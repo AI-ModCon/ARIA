@@ -2,7 +2,7 @@
 
 Implements [RFC 001 — Run invocation I/O and MAG `tool_calls`](../rfcs/001-run-invocation-and-tool-use.md).
 
-The spine [`execution-context.schema.json`](../schemas/common/execution-context.schema.json) records reproducibility hashes only. Platform v0 additionally sends literal `inputs` (messages, tools, prompt) and `parameters` (model, system) and returns `outputs.tool_calls`. The optional companion [`RunInvocation`](schemas/run-invocation.schema.json) artefact captures that literal request/response payload **without widening the mandatory spine**. Orchestrators that only emit hashes can ignore it; deployments that need to persist or exchange the verbatim invocation reference it by `contextHash`.
+The spine [`execution-context.schema.json`](../schemas/common/execution-context.schema.json) records reproducibility hashes only. Platform v0 additionally sends literal `inputs` (messages, tools, prompt) and `parameters` (model, system) and returns `outputs.tool_calls`. The optional companion [`RunInvocation`](schemas/run-invocation.schema.json) artefact captures that literal request/response payload **without widening the mandatory spine**. Orchestrators that only emit hashes can ignore it; deployments that need to persist or exchange the verbatim invocation reference it by `contextHash`. A `RunInvocation` records MAG/model turns; executed-tool telemetry remains in the event stream, and tool results can appear as later `role:"tool"` messages linked by `tool_call_id`.
 
 This document defines how the Model/Agent Gateway (MAG) **normalizes** provider-specific OpenAI and Anthropic shapes into the single `RunInvocation` representation.
 
@@ -55,8 +55,12 @@ Normalization rules:
 
 ## `maxToolCalls` semantics
 
-Budget enforcement counts **model-returned `tool_calls` batches per MAG invoke** — i.e. `len(outputs.tool_calls)` — not local tool-agent executions. See the platform [`platform-v0-implementation-profile.json`](https://github.com/brettin/ARIAPlatform_v0/blob/main/reference/platform-v0-implementation-profile.json) `semantics.maxToolCalls`.
+Budget enforcement counts **model-returned tool call items per MAG invoke** — i.e. `len(outputs.tool_calls)` — not local tool-agent executions. See the platform [`platform-v0-implementation-profile.json`](https://github.com/brettin/ARIAPlatform_v0/blob/main/reference/platform-v0-implementation-profile.json) `semantics.maxToolCalls`.
 
 ## Spine linkage
 
-`RunInvocation.contextHash` ties back to a spine [`Run.executionContext`](../schemas/common/run.schema.json). When a single canonical hash is used it equals `ExecutionContext.configHash`; otherwise it is an opaque digest agreed by orchestrator and platform. The spine `Run` is intentionally **not** widened — `RunInvocation` stays companion/optional, consistent with [`profiles/core-v3-companion.json`](../profiles/core-v3-companion.json).
+`RunInvocation.contextHash` ties back to a spine [`Run.executionContext`](../schemas/common/run.schema.json). When a single canonical hash is used it may equal the 64-hex `ExecutionContext.configHash`; otherwise it is a documented 32-hex platform digest agreed by orchestrator and platform. The spine `Run` is intentionally **not** widened — `RunInvocation` stays companion/optional, consistent with [`profiles/core-v3-companion.json`](../profiles/core-v3-companion.json).
+
+## Sensitivity and retention
+
+`RunInvocation` can contain literal prompts, messages, parameters, and decoded tool inputs. Deployments should treat these records as sensitive audit artefacts, apply access controls and retention policy, and redact or replace raw values with deployment-owned references or digests when raw invocation payloads cannot be stored.
