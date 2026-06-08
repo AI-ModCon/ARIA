@@ -1,7 +1,7 @@
 {
   "profileId": "core-v3-companion",
   "version": "3.0.1",
-  "description": "Optional bundle: mandates spine core-v3 artefacts plus CampaignPlan / DataMovementIntent / EvalPublication companion JSON Schemas for cross-enterprise interoperability.",
+  "description": "Optional bundle: mandates spine core-v3 artefacts plus CampaignPlan / DataMovementIntent / EvalPublication / RunInvocation companion JSON Schemas for cross-enterprise interoperability.",
   "requiredApiSpec": "../openapi/gmp-core-v3.yaml",
   "requiredOperations": [
     "establishSession",

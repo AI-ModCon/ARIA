@@ -1,6 +1,6 @@
 # GMP Companion Schemas
 
-Optional JSON Schemas for **enterprise interoperability** that sit **outside** the mandatory `core-v3` profile defined in [profiles/core-v3.json](../profiles/core-v3.json). Use them when exchanging portable **campaign graphs**, **data-movement intents**, or **evaluation publication metadata** across sites—without widening the spine OpenAPI into a universal platform specification.
+Optional JSON Schemas for **enterprise interoperability** that sit **outside** the mandatory `core-v3` profile defined in [profiles/core-v3.json](../profiles/core-v3.json). Use them when exchanging portable **campaign graphs**, **data-movement intents**, **evaluation publication metadata**, or **literal run invocation records** across sites—without widening the spine OpenAPI into a universal platform specification.
 
 Deployments that commit to validating these artefacts may adopt **[profiles/core-v3-companion.json](../profiles/core-v3-companion.json)** in addition to the spine profile.
 
