@@ -356,7 +356,35 @@ def main() -> int:
                         "properties": {
                             "eventId": {"type": "string"},
                             "eventType": {"type": "string"},
-                            "occurredAt": {"type": "string"},
+                            "occurredAt": {"type": "string", "format": "date-time"},
+                            "source": {"type": "string"},
+                            "payload": {"type": "object"},
+                            "correlationId": {"type": "string"},
+                            "runId": {"type": "string"},
+                            "agentId": {"type": "string"},
+                            "metadata": {"type": "object"},
+                        },
+                        "additionalProperties": False,
+                    },
+                },
+                "nextCursor": {"type": ["string", "null"]},
+                "total": {"type": "integer"},
+            },
+            "additionalProperties": False,
+        },
+        "events-list-no-total.response.json": {
+            "type": "object",
+            "required": ["items"],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["eventId", "eventType", "occurredAt", "source", "payload"],
+                        "properties": {
+                            "eventId": {"type": "string"},
+                            "eventType": {"type": "string"},
+                            "occurredAt": {"type": "string", "format": "date-time"},
                             "source": {"type": "string"},
                             "payload": {"type": "object"},
                             "correlationId": {"type": "string"},
