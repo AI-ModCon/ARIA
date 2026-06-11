@@ -1,0 +1,17 @@
+{
+  "eventType": "journal.run.completed",
+  "payload": {
+    "runId": "run_01K3RUN0001",
+    "failureClass": "F0_NONE",
+    "lineageRefs": ["https://provenance.example/lineage/run_01K3RUN0001"],
+    "details": {
+      "durationSeconds": 252
+    }
+  },
+  "runId": "run_01K3RUN0001",
+  "agentId": "agent_mag_01",
+  "correlationId": "run_01K3RUN0001",
+  "metadata": {
+    "deployment": "anl-dev"
+  }
+}
