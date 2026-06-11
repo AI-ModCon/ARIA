@@ -872,39 +872,93 @@ paths:
       operationId: appendEvent
       tags: [EventsProvenance]
       summary: Append a unified provenance or reasoning event
+      description: >-
+        Accepts the RFC 005 append projection. Clients MUST omit eventId, occurredAt, and
+        source; the server populates them and normalizes the event into the canonical
+        GmpEvent shape (event-envelope.schema.json) before persistence. The normalized
+        event is validated against the oneOf branch matching its eventType; violations
+        return 422. Append is at-least-once: the server does not de-duplicate, and each
+        accepted request produces a new eventId.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: ../schemas/events/event-envelope.schema.json
+              $ref: '#/components/schemas/EventAppendRequest'
       responses:
-        '202':
-          $ref: '#/components/responses/AcceptedNoContent'
+        '201':
+          $ref: '#/components/responses/EventAppended'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEvent'
         '500':
           $ref: '#/components/responses/InternalError'
     get:
       operationId: listEvents
       tags: [EventsProvenance]
-      summary: Query events by run and optional event type filter
+      summary: Query events in ascending (occurredAt, eventId) order
+      description: >-
+        Returns EventListItem projections ordered by occurredAt ascending with eventId as
+        a stable tiebreaker. All filters combine with AND semantics; v0 does not support
+        OR, negation, multi-value filters, or payload-content search. Clients SHOULD use
+        cursor pagination (pass nextCursor back via cursor); offset is deprecated.
       parameters:
         - in: query
           name: runId
           required: false
+          description: Exact match on the run identifier.
           schema:
             type: string
         - in: query
           name: eventType
           required: false
+          description: >-
+            Exact match on a single eventType value (e.g. reasoning.node, tool.call,
+            journal.run.completed).
           schema:
             type: string
-            description: >-
-              Filter by eventType prefix or exact value (e.g. reasoning.node, tool.call,
-              journal.run.completed).
+        - in: query
+          name: agentId
+          required: false
+          description: Exact match on the agent identifier.
+          schema:
+            type: string
+        - in: query
+          name: since
+          required: false
+          description: Return events with occurredAt >= since.
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: cursor
+          required: false
+          description: >-
+            Opaque pagination cursor from a prior response's nextCursor. Preferred over
+            offset for forward iteration.
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          description: Page size; default 100, maximum 1000.
+          schema:
+            type: integer
+            default: 100
+            maximum: 1000
+        - in: query
+          name: offset
+          required: false
+          deprecated: true
+          description: >-
+            Skip-N pagination. Deprecated v0 convenience; prefer cursor. MAY be removed in
+            a future release.
+          schema:
+            type: integer
+            default: 0
       responses:
         '200':
           $ref: '#/components/responses/EventListSuccess'
@@ -940,6 +994,75 @@ components:
           type: array
           items:
             $ref: ../schemas/common/availability.schema.json
+    EventAppendRequest:
+      type: object
+      description: >-
+        RFC 005 append projection. Clients send only fields the server cannot infer;
+        eventId, occurredAt, and source MUST be omitted (server-populated). The stored
+        event validates against the canonical GmpEvent oneOf
+        (event-envelope.schema.json); per-eventType payload shapes are enforced
+        server-side, not at the DTO level.
+      required: [eventType, payload]
+      properties:
+        eventType:
+          type: string
+          minLength: 1
+        payload:
+          type: object
+          description: >-
+            Opaque at the DTO level; validated server-side against the oneOf branch
+            matching eventType.
+        runId:
+          type: string
+          description: Optional query-index hint; MAY duplicate payload.runId.
+        agentId:
+          type: string
+          description: Optional query-index hint.
+        correlationId:
+          type: string
+        metadata:
+          type: object
+          description: >-
+            Deployment-specific sidecar extensions. Stored alongside the canonical
+            envelope and returned on list; excluded from GmpEvent schema validation and
+            never merged into payload.
+      additionalProperties: false
+    EventListItem:
+      type: object
+      description: >-
+        RFC 005 list projection of a stored GmpEvent. Query-index fields (runId, agentId)
+        and sidecar metadata are a read-model convenience; each item validates as a
+        GmpEvent (event-envelope.schema.json) after stripping metadata and normalizing
+        index fields into the matching oneOf branch.
+      required: [eventId, eventType, occurredAt, source, payload]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+        source:
+          type: string
+          description: Server-authoritative; returned top-level.
+        payload:
+          type: object
+          description: >-
+            Opaque at the DTO level; typed per the event-envelope.schema.json oneOf
+            branch.
+        correlationId:
+          type: string
+        runId:
+          type: string
+          description: Query index; MAY duplicate payload.runId.
+        agentId:
+          type: string
+          description: Query index.
+        metadata:
+          type: object
+          description: Deployment extensions and non-schema sidecar data.
+      additionalProperties: false
     EventListResponse:
       type: object
       required: [items]
@@ -947,7 +1070,15 @@ components:
         items:
           type: array
           items:
-            $ref: ../schemas/events/event-envelope.schema.json
+            $ref: '#/components/schemas/EventListItem'
+        nextCursor:
+          type: ['string', 'null']
+          description: >-
+            Opaque cursor for the next page (encodes occurredAt and eventId). Absent or
+            null means end-of-stream.
+        total:
+          type: integer
+          description: Optional total count; MAY be omitted for large journals.
     StructuredError:
       $ref: ../schemas/common/structured-error.schema.json
     WorkflowState:
@@ -1107,8 +1238,36 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/DivergenceAlertListResponse'
+    EventAppended:
+      description: >-
+        Event durably persisted. The Location header names the canonical resource
+        identity; it is informational in v0 (no getEvent operation exists yet).
+      headers:
+        Location:
+          description: Canonical resource URL, e.g. /v3/events/{eventId}.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [eventId]
+            properties:
+              eventId:
+                type: string
+            additionalProperties: false
+    UnprocessableEvent:
+      description: >-
+        Event failed server-side validation against the canonical GmpEvent oneOf
+        (unknown eventType or malformed payload for the matching branch).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StructuredError'
     EventListSuccess:
-      description: Unified event stream (journal, run lifecycle, policy, reasoning, tool calls).
+      description: >-
+        Unified event stream (journal, run lifecycle, policy, reasoning, tool calls) in
+        ascending (occurredAt, eventId) order with cursor pagination.
       content:
         application/json:
           schema:

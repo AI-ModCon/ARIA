@@ -329,6 +329,49 @@ def main() -> int:
             },
             "additionalProperties": False,
         },
+        # RFC 005 append projection: clients MUST omit eventId/occurredAt/source.
+        "events-append.request.json": {
+            "type": "object",
+            "required": ["eventType", "payload"],
+            "properties": {
+                "eventType": {"type": "string"},
+                "payload": {"type": "object"},
+                "runId": {"type": "string"},
+                "agentId": {"type": "string"},
+                "correlationId": {"type": "string"},
+                "metadata": {"type": "object"},
+            },
+            "additionalProperties": False,
+        },
+        # RFC 005 list projection: EventListItem items plus cursor pagination envelope.
+        "events-list.response.json": {
+            "type": "object",
+            "required": ["items"],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["eventId", "eventType", "occurredAt", "source", "payload"],
+                        "properties": {
+                            "eventId": {"type": "string"},
+                            "eventType": {"type": "string"},
+                            "occurredAt": {"type": "string"},
+                            "source": {"type": "string"},
+                            "payload": {"type": "object"},
+                            "correlationId": {"type": "string"},
+                            "runId": {"type": "string"},
+                            "agentId": {"type": "string"},
+                            "metadata": {"type": "object"},
+                        },
+                        "additionalProperties": False,
+                    },
+                },
+                "nextCursor": {"type": ["string", "null"]},
+                "total": {"type": "integer"},
+            },
+            "additionalProperties": False,
+        },
         "runs-submit.request.json": {
             "type": "object",
             "required": ["capabilityId", "executionContext", "idempotencyKey"],
