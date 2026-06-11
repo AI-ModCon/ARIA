@@ -7,9 +7,18 @@ and this project adheres to semantic-style version labels used by the ARIA spec 
 
 ## [Unreleased]
 
+## [v0.3.5] - 2026-06-11
+
 ### Added
 
 - Added this changelog.
+- Added RFC 005 as the normative record for events append/list DTO alignment over the canonical `GmpEvent` envelope.
+- Added append-projection and list-response fixtures (including cursor pagination without `total`) with validator coverage.
+
+### Changed
+
+- Updated `appendEvent` in `gmp-core-v3.yaml` to accept the RFC 005 append projection, return `201 Created` with `Location` and `{"eventId"}`, and document `422` validation against the canonical `oneOf`.
+- Updated `listEvents` to return `EventListItem` projections with `(occurredAt, eventId)` ordering, cursor pagination, expanded v0 filters, and deprecated `offset`.
 
 ## [v0.3.4] - 2026-06-09
 
@@ -82,7 +91,8 @@ and this project adheres to semantic-style version labels used by the ARIA spec 
 - Added the initial contracts package baseline.
 - Added repository-level documentation for the contracts layout and tracked files.
 
-[Unreleased]: https://github.com/brettin/ARIA/compare/v0.3.4...HEAD
+[Unreleased]: https://github.com/brettin/ARIA/compare/v0.3.5...HEAD
+[v0.3.5]: https://github.com/brettin/ARIA/compare/v0.3.4...v0.3.5
 [v0.3.4]: https://github.com/brettin/ARIA/releases/tag/v0.3.4
 [v0.3.3]: https://github.com/brettin/ARIA/releases/tag/v0.3.3
 [v0.3.2]: https://github.com/brettin/ARIA/releases/tag/v0.3.2
