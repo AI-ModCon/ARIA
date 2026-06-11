@@ -948,6 +948,7 @@ paths:
           schema:
             type: integer
             default: 100
+            minimum: 1
             maximum: 1000
         - in: query
           name: offset
@@ -959,6 +960,7 @@ paths:
           schema:
             type: integer
             default: 0
+            minimum: 0
       responses:
         '200':
           $ref: '#/components/responses/EventListSuccess'
@@ -1007,6 +1009,7 @@ components:
         eventType:
           type: string
           minLength: 1
+          description: Unknown eventType values fail server-side validation with 422.
         payload:
           type: object
           description: >-
