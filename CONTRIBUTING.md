@@ -46,17 +46,19 @@ Contract-surface changes (new operations, schema fields, or breaking semantics) 
 
 1. Fork the repository
 2. Clone your fork: `git clone https://github.com/AI-ModCon/ARIA.git`
-3. Create a new branch: `git checkout -b feature/my-feature`
-4. Make your changes under `contracts/` (or `scripts/` for the validator)
-5. Validate contracts:
+3. Follow the [RFC process](contracts/rfcs/README.md) **before making contract changes**:
+   - Draft one RFC under `contracts/rfcs/` (one PR per RFC; no schema or OpenAPI edits in that PR)
+   - Wait for the RFC to merge before starting implementation
+   - Documentation-only, validator-only, and typo fixes may skip this step
+4. Create a new branch: `git checkout -b feature/my-feature`
+5. Make your changes under `contracts/` (or `scripts/` for the validator)
+6. Validate contracts:
    ```bash
    make validate-v3-contracts
    ```
-6. Commit your changes: `git commit -am "Add my feature"`
-7. Push to the branch: `git push origin feature/my-feature`
-8. Submit a pull request
-
-For RFC drafts, see [`contracts/rfcs/README.md`](contracts/rfcs/README.md). Open one PR per RFC.
+7. Commit your changes: `git commit -am "Add my feature"`
+8. Push to the branch: `git push origin feature/my-feature`
+9. Submit a pull request
 
 ## Style Guidelines
 
