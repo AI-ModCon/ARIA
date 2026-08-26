@@ -7,6 +7,11 @@ and this project adheres to semantic-style version labels used by the ARIA spec 
 
 ## [Unreleased]
 
+### Added
+
+- Added Apache 2.0 `LICENSE`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` adapted from the ModCon BaseTemplate.
+- Added GitHub issue and pull request templates under `.github/`.
+
 ## [v0.3.5] - 2026-06-11
 
 ### Added
