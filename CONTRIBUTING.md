@@ -45,7 +45,7 @@ Contract-surface changes (new operations, schema fields, or breaking semantics) 
 ## Development Setup
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/AI-ModCon/ARIA.git`
+2. Clone your fork: `git clone https://github.com/<your-username>/ARIA.git`
 3. Follow the [RFC process](contracts/rfcs/README.md) **before making contract changes**:
    - Draft one RFC under `contracts/rfcs/` (one PR per RFC; no schema or OpenAPI edits in that PR)
    - Wait for the RFC to merge before starting implementation

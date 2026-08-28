@@ -1,6 +1,14 @@
 # Spec RFCs
 
-Draft RFCs for GMP core-v3 contract changes proposed from [ARIAPlatform](https://github.com/brettin/ARIAPlatform_v0) alignment work. Open one PR per RFC; track gap IDs from the platform [`spec-implementation-gap-register.json`](https://github.com/brettin/ARIAPlatform_v0/blob/main/reference/spec-implementation-gap-register.json).
+Draft RFCs for GMP core-v3 contract changes proposed from [ARIAPlatform](https://github.com/brettin/ARIAPlatform_v0) alignment work. Track gap IDs from the platform [`spec-implementation-gap-register.json`](https://github.com/brettin/ARIAPlatform_v0/blob/main/reference/spec-implementation-gap-register.json).
+
+## Process
+
+1. Draft one RFC under this directory and open **one PR per RFC** (design only; no schema or OpenAPI edits in that PR).
+2. Wait for the RFC PR to **merge** before opening a follow-up implementation PR.
+3. Documentation-only, validator-only, and typo fixes may skip this process.
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full development workflow.
 
 | RFC | Title | Priority |
 | --- | --- | --- |

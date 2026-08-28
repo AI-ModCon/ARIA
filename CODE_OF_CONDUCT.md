@@ -24,7 +24,7 @@ Examples of unacceptable behavior by participants include:
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at [brettin@anl.gov](mailto:brettin@anl.gov) (see [NOTICE](NOTICE) for contact details). All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances.
 
 Project maintainers are obligated to maintain confidentiality with regard to the reporter of an incident.
 

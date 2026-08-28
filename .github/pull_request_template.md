@@ -30,7 +30,7 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 - [ ] I have performed a self-review of my own work
 - [ ] I have made corresponding changes to the documentation
 - [ ] `$ref` paths resolve and fixtures remain valid
-- [ ] Breaking contract changes are called out and follow [v3-release-governance.md](../contracts/v3-release-governance.md)
+- [ ] Breaking contract changes are called out and follow [v3-release-governance.md](https://github.com/AI-ModCon/ARIA/blob/main/contracts/v3-release-governance.md)
 - [ ] If AI/LLM tools were primarily used, that is disclosed in Additional Context
 
 ## Additional Context

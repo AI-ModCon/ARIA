@@ -29,3 +29,7 @@ This project is licensed under the Apache License 2.0 — see the [LICENSE](LICE
 ## Code of Conduct
 
 Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+
+## Support
+
+This project acknowledges support from the U.S. Department of Energy's Genesis Mission.

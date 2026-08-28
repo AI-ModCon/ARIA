@@ -9,7 +9,7 @@ and this project adheres to semantic-style version labels used by the ARIA spec 
 
 ### Added
 
-- Added Apache 2.0 `LICENSE`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` adapted from the ModCon BaseTemplate.
+- Added Apache 2.0 `LICENSE`, `NOTICE`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` adapted from the ModCon BaseTemplate.
 - Added GitHub issue and pull request templates under `.github/`.
 
 ## [v0.3.5] - 2026-06-11
@@ -96,12 +96,12 @@ and this project adheres to semantic-style version labels used by the ARIA spec 
 - Added the initial contracts package baseline.
 - Added repository-level documentation for the contracts layout and tracked files.
 
-[Unreleased]: https://github.com/brettin/ARIA/compare/v0.3.5...HEAD
-[v0.3.5]: https://github.com/brettin/ARIA/compare/v0.3.4...v0.3.5
-[v0.3.4]: https://github.com/brettin/ARIA/releases/tag/v0.3.4
-[v0.3.3]: https://github.com/brettin/ARIA/releases/tag/v0.3.3
-[v0.3.2]: https://github.com/brettin/ARIA/releases/tag/v0.3.2
-[v_0.3.1]: https://github.com/brettin/ARIA/releases/tag/v_0.3.1
-[v_0.3]: https://github.com/brettin/ARIA/releases/tag/v_0.3
-[v_0.2]: https://github.com/brettin/ARIA/releases/tag/v_0.2
-[v_0.1]: https://github.com/brettin/ARIA/releases/tag/v_0.1
+[Unreleased]: https://github.com/AI-ModCon/ARIA/compare/v0.3.5...HEAD
+[v0.3.5]: https://github.com/AI-ModCon/ARIA/compare/v0.3.4...v0.3.5
+[v0.3.4]: https://github.com/AI-ModCon/ARIA/releases/tag/v0.3.4
+[v0.3.3]: https://github.com/AI-ModCon/ARIA/releases/tag/v0.3.3
+[v0.3.2]: https://github.com/AI-ModCon/ARIA/releases/tag/v0.3.2
+[v_0.3.1]: https://github.com/AI-ModCon/ARIA/releases/tag/v_0.3.1
+[v_0.3]: https://github.com/AI-ModCon/ARIA/releases/tag/v_0.3
+[v_0.2]: https://github.com/AI-ModCon/ARIA/releases/tag/v_0.2
+[v_0.1]: https://github.com/AI-ModCon/ARIA/releases/tag/v_0.1

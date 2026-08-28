@@ -24,7 +24,7 @@ A clear and concise description of any alternative solutions or features you've 
 - [ ] Documentation / tooling only
 - [ ] Additive optional field or operation (minor)
 - [ ] Breaking change (new major API path)
-- [ ] Needs an [RFC](../../contracts/rfcs/README.md)
+- [ ] Needs an [RFC](https://github.com/AI-ModCon/ARIA/blob/main/contracts/rfcs/README.md)
 
 ## Additional Context
 
