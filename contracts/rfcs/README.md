@@ -18,6 +18,7 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full development workflow.
 | [003](003-run-status-vocabulary.md) | Run status enum | P1 |
 | [004](004-budgets-allocate-enforce.md) | Budget allocate and enforce | P1 |
 | [006](006-capability-registry-platform.md) | Capability registry vs spec Capability | P2 |
+| [007](007-durable-memory-taxonomy-and-scope.md) | Durable memory taxonomy & scope | P2 |
 
 ## Suggested merge order
 
@@ -27,5 +28,6 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full development workflow.
 4. RFC 003 — Run status vocabulary
 5. RFC 004 — Budget allocate and enforce
 6. RFC 006 — Capability registry vs spec `Capability`
+7. RFC 007 — Durable memory taxonomy & scope
 
 Until an RFC merges, platform v0 may continue to document wire behavior in [`platform-v0-implementation-profile.json`](https://github.com/brettin/ARIAPlatform_v0/blob/main/reference/platform-v0-implementation-profile.json).
