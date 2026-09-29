@@ -4,9 +4,12 @@ Draft RFCs for GMP core-v3 contract changes proposed from [ARIAPlatform](https:/
 
 ## Process
 
-1. Draft one RFC under this directory and open **one PR per RFC** (design only; no schema or OpenAPI edits in that PR).
-2. Wait for the RFC PR to **merge** before opening a follow-up implementation PR.
-3. Documentation-only, validator-only, and typo fixes may skip this process.
+1. Draft one RFC under `contracts/rfcs/` and open **one PR per RFC** (design only; no schema or OpenAPI edits in that PR).
+2. Review the RFC until the design is considered implementation-ready. Keep the RFC PR open as the primary design/discussion record.
+3. Open a separate implementation PR linked to the RFC. Incorporate implementation findings back into the RFC discussion when they materially affect the design.
+4. Merge the implementation PR after validation and independent review.
+5. Finalize and merge the RFC PR after the implementation has landed and the design record reflects the implemented decision.
+6. Documentation-only, validator-only, and typo fixes may skip this process.
 
 See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full development workflow.
 
