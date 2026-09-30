@@ -10,6 +10,10 @@ and this project adheres to semantic-style version labels used by the ARIA spec 
 ### Added
 
 - Added Apache 2.0 `LICENSE`, `NOTICE`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` adapted from the ModCon BaseTemplate.
+
+### Changed
+
+- Aligned RFC process documentation with the implementation-ready workflow: the RFC PR now stays open during implementation and merges after the implementation PR lands (#25).
 - Added GitHub issue and pull request templates under `.github/`.
 
 ## [v0.3.5] - 2026-06-11

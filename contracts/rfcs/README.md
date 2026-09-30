@@ -7,9 +7,11 @@ Draft RFCs for GMP core-v3 contract changes proposed from [ARIAPlatform](https:/
 1. Draft one RFC under `contracts/rfcs/` and open **one PR per RFC** (design only; no schema or OpenAPI edits in that PR).
 2. Review the RFC until the design is considered implementation-ready. Keep the RFC PR open as the primary design/discussion record.
 3. Open a separate implementation PR linked to the RFC. Incorporate implementation findings back into the RFC discussion when they materially affect the design.
-4. Merge the implementation PR after validation and independent review.
-5. Finalize and merge the RFC PR after the implementation has landed and the design record reflects the implemented decision.
-6. Documentation-only, validator-only, and typo fixes may skip this process.
+4. Validate the implementation against ARIAPlatform and the contract validator (`make validate-v3-contracts`).
+5. Merge the implementation PR after validation and independent review.
+6. Version/tag the resulting specification release.
+7. Finalize and merge the RFC PR after the implementation has landed and any implementation-discovered design adjustments have been reflected back into the RFC record.
+8. Documentation-only, validator-only, and typo fixes may skip this process.
 
 See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full development workflow.
 
@@ -22,7 +24,7 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full development workflow.
 | [004](004-budgets-allocate-enforce.md) | Budget allocate and enforce | P1 |
 | [006](006-capability-registry-platform.md) | Capability registry vs spec Capability | P2 |
 
-## Suggested merge order
+## Suggested implementation order
 
 1. RFC 001 — Run invocation I/O and MAG `tool_calls`
 2. RFC 002 — `tool.call` events vs LLM tool-use
@@ -31,4 +33,4 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full development workflow.
 5. RFC 004 — Budget allocate and enforce
 6. RFC 006 — Capability registry vs spec `Capability`
 
-Until an RFC merges, platform v0 may continue to document wire behavior in [`platform-v0-implementation-profile.json`](https://github.com/brettin/ARIAPlatform_v0/blob/main/reference/platform-v0-implementation-profile.json).
+Until the implementation PR for an RFC merges, platform v0 may continue to document wire behavior in [`platform-v0-implementation-profile.json`](https://github.com/brettin/ARIAPlatform_v0/blob/main/reference/platform-v0-implementation-profile.json).

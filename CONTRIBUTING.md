@@ -49,7 +49,7 @@ Contract-surface changes (new operations, schema fields, or breaking semantics) 
 3. Follow the [RFC process](contracts/rfcs/README.md) **before making contract changes**:
    - Draft one RFC under `contracts/rfcs/` and open one PR per RFC; do not include normative schema/OpenAPI changes in the RFC PR.
    - Obtain independent RFC review and resolve material design questions.
-   - Once the RFC is judged implementation-ready, create a separate implementation branch/PR linked to the RFC.
+   - Once the RFC is judged implementation-ready, create a separate implementation branch/PR linked to the RFC (e.g., `rfc/001-run-invocation-impl`).
    - Keep the RFC PR open while implementation, ARIAPlatform validation, and implementation review proceed.
    - After the implementation PR merges, update/finalize the RFC record as needed and merge the RFC PR.
    - Documentation-only, validator-only, and typo fixes may skip this step.
