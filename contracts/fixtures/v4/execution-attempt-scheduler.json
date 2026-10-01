@@ -1,0 +1,13 @@
+{
+  "attemptId": "attempt-scheduler-001",
+  "runId": "run-7f3e2a",
+  "externalSystem": {
+    "type": "scheduler",
+    "endpoint": "https://api.alcf.anl.gov/iri/v1"
+  },
+  "externalTaskId": "slurm-9241337",
+  "status": "running",
+  "lastReconciledAt": "2026-10-01T15:04:05Z",
+  "idempotencyKey": "idem-4d5e6f",
+  "createdAt": "2026-10-01T14:58:11Z"
+}

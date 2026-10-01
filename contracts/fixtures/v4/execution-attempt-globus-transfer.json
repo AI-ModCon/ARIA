@@ -1,0 +1,13 @@
+{
+  "attemptId": "attempt-globus-transfer-001",
+  "runId": "run-7f3e2a",
+  "externalSystem": {
+    "type": "globus_transfer",
+    "endpoint": "https://transfer.api.globus.org/v0.10"
+  },
+  "externalTaskId": "gt-task-0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d",
+  "status": "running",
+  "lastReconciledAt": "2026-10-01T15:04:05Z",
+  "idempotencyKey": "idem-4d5e6f",
+  "createdAt": "2026-10-01T14:58:11Z"
+}
