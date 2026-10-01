@@ -1,0 +1,71 @@
+name: PR Review Agent
+
+# Automated PR review performed by a headless Hermes agent (backed by Argo
+# claude-opus-5) running on the self-hosted lambda5 runner, which has network
+# access to the local Argo proxy. Same-repo PRs only: fork PRs do not receive
+# secrets/tokens and are intentionally skipped.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: pr-review-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    if: >-
+      (github.event_name == 'pull_request') ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request != null &&
+       github.event.comment.user.type != 'Bot')
+    runs-on: [self-hosted, lambda5]
+    steps:
+      - name: Resolve PR number
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+            echo "head_sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+            echo "same_repo=${{ github.event.pull_request.head.repo.full_name == github.repository }}" >> "$GITHUB_OUTPUT"
+          else
+            num="${{ github.event.issue.number }}"
+            echo "number=$num" >> "$GITHUB_OUTPUT"
+            echo "head_sha=$(gh api repos/${{ github.repository }}/pulls/$num -q .head.sha)" >> "$GITHUB_OUTPUT"
+            echo "same_repo=$(gh api repos/${{ github.repository }}/pulls/$num -q '.head.repo.full_name == "${{ github.repository }}"')" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Skip fork PRs
+        if: steps.pr.outputs.same_repo != 'true'
+        run: echo "PR is from a fork; skipping (secrets/token unavailable to fork PRs by design)."
+
+      - name: Checkout PR head
+        if: steps.pr.outputs.same_repo == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.head_sha }}
+          fetch-depth: 0
+
+      - name: Review with Hermes (Argo)
+        if: steps.pr.outputs.same_repo == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          export HERMES_HOME="$HOME/.hermes/profiles/pr-review-aria-spec"
+          PROMPT="$(cat .github/pr-review-prompt.md)"
+          PROMPT="Review pull request #${PR_NUMBER} in AI-ModCon/ARIA now.
+
+          ${PROMPT}"
+          hermes chat -q "$PROMPT"
