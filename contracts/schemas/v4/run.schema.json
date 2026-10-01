@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/v4/run.schema.json",
+  "title": "Run",
+  "type": "object",
+  "required": [
+    "runId",
+    "capabilityId",
+    "status",
+    "submittedAt",
+    "executionContext",
+    "failureClass"
+  ],
+  "properties": {
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capabilityId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "paused",
+        "succeeded",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "submittedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "idempotencyKey": {
+      "type": "string"
+    },
+    "executionContext": {
+      "$ref": "./execution-context.schema.json"
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "targetId",
+          "state"
+        ],
+        "properties": {
+          "targetId": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "running",
+              "failed",
+              "succeeded",
+              "skipped"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "failureClass": {
+      "type": "string",
+      "enum": [
+        "F0_NONE",
+        "F1_MISSING_ARTIFACT",
+        "F2_ENVIRONMENT",
+        "F3_DATA_ACCESS",
+        "F4_POLICY",
+        "F5_UNSPECIFIED_CONFIG",
+        "F6_HPC_QUEUE",
+        "F7_RUNTIME",
+        "F8_DOMAIN_ASSUMPTION"
+      ]
+    },
+    "planId": {
+      "type": "string",
+      "description": "Optional plan identifier returned by POST /v3/runs:plan when negotiation preflight was used."
+    },
+    "planRef": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI of a CampaignPlan artefact when using companion plan schema; opaque to orchestrators that emit only planId."
+    },
+    "planDigest": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$",
+      "description": "SHA-256 hex digest over the canonical CampaignPlan bytes referenced by planRef."
+    },
+    "currentCheckpointId": {
+      "type": "string",
+      "description": "Latest durable checkpoint for this run, if any."
+    },
+    "workflowState": {
+      "$ref": "../common/workflow-state.schema.json"
+    }
+  },
+  "additionalProperties": false
+}
