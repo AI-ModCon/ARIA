@@ -1,0 +1,11 @@
+{
+  "runId": "run-7f3e2a",
+  "capabilityId": "example-value",
+  "status": "paused",
+  "submittedAt": "2026-10-01T15:00:00Z",
+  "executionContext": {
+    "configHash": "example-value",
+    "environmentHash": "example-value"
+  },
+  "failureClass": "F0_NONE"
+}

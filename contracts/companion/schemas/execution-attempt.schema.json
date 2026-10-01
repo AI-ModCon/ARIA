@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/companion/schemas/execution-attempt.schema.json",
+  "title": "ExecutionAttempt",
+  "description": "Companion record linking one Run attempt to an external task identity (scheduler job via IRI, Globus Compute task, Globus Transfer task) with reconciliation-after-restart semantics. Proposed by RFC 022.",
+  "type": "object",
+  "required": [
+    "attemptId",
+    "runId",
+    "externalSystem",
+    "externalTaskId",
+    "createdAt"
+  ],
+  "properties": {
+    "attemptId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "externalSystem": {
+      "type": "object",
+      "required": [
+        "type",
+        "endpoint"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "scheduler",
+            "globus_compute",
+            "globus_transfer",
+            "other"
+          ]
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": false
+    },
+    "externalTaskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "externalTaskUri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "running",
+        "succeeded",
+        "failed",
+        "cancelled",
+        "lost"
+      ]
+    },
+    "lastReconciledAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "supersedesAttemptId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

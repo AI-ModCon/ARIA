@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/v4/handoff.schema.json",
+  "title": "Handoff",
+  "type": "object",
+  "required": [
+    "handoffId",
+    "fromAgentId",
+    "toAgentId",
+    "taskRef",
+    "reason",
+    "createdAt"
+  ],
+  "properties": {
+    "handoffId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fromAgentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "toAgentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "taskRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capabilityTokenRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "budgetRef": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}
