@@ -1,0 +1,57 @@
+{
+  "profileId": "federation-v4",
+  "version": "4.0.0-draft",
+  "extendsProfileId": "core-v4-minimal",
+  "description": "Cross-trust-domain federation profile with tiered conformance levels C0-C4. See federation-v4.md for level definitions.",
+  "constraints": {
+    "payloadSerialization": "json-only",
+    "delegationChainMaterialized": true,
+    "revocationCheckPerHop": true
+  },
+  "conformanceLevels": {
+    "C0": {
+      "modules": [],
+      "evidenceClass": "reference"
+    },
+    "C1": {
+      "modules": [
+        "durable-execution",
+        "availability"
+      ],
+      "evidenceClass": "local-live"
+    },
+    "C2": {
+      "modules": [
+        "durable-execution",
+        "availability",
+        "accounting",
+        "sandbox"
+      ],
+      "evidenceClass": "scheduler-live"
+    },
+    "C3": {
+      "modules": [
+        "durable-execution",
+        "availability",
+        "accounting",
+        "sandbox",
+        "supervision",
+        "evals"
+      ],
+      "evidenceClass": "fleet-live"
+    },
+    "C4": {
+      "modules": [
+        "durable-execution",
+        "availability",
+        "accounting",
+        "sandbox",
+        "supervision",
+        "evals",
+        "coordination",
+        "memory"
+      ],
+      "evidenceClass": "cross-org-live"
+    }
+  }
+}
