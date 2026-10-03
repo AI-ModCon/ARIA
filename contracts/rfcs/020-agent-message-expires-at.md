@@ -15,11 +15,32 @@ message TTL, so adapters will fill arbitrary far-future timestamps.
 ## Proposal
 
 - Remove `expiresAt` from `required` (loosening change; existing payloads, including
-  `fixtures/v3/agent-message.request.json`, remain valid).
-- Define semantics when present: a deliverer MUST NOT deliver a message after
-  `expiresAt`; an expired undelivered message is dropped and SHOULD be journaled via
-  `appendEvent` with the message's correlation (see RFC 018 for `correlationId`).
-- Absent `expiresAt` means no TTL.
+  `fixtures/v3/agent-message.request.json`, remain valid). Absent `expiresAt` means no
+  TTL.
+- **Obligated party.** The implementation that accepted the message at
+  `sendAgentMessage` (the party that returned `202`) owns the expiry obligation: it MUST
+  NOT deliver the message after `expiresAt`, and any transport it hands the message to
+  acts on its behalf and inherits the same obligation. (The core has no deliver
+  operation, so the obligation attaches to acceptance, not to an API call.)
+- **Journaling, with a named event type.**
+  [`event-envelope.schema.json`](../schemas/events/event-envelope.schema.json) is a
+  closed `oneOf` and the `journal.*` `eventType` enum in
+  [`journal-envelope-event.schema.json`](../schemas/events/journal-envelope-event.schema.json)
+  is closed, so "SHOULD be journaled" needs a concrete branch. This RFC adds
+  **`journal.message.expired`** to the journal `eventType` enum (landing on the v4 copy
+  of the journal envelope schema, alongside the RFC 019 v4 event-envelope landing).
+  Payload mapping under the existing closed journal payload (`runId`, `failureClass`
+  required; `details` open):
+  - `payload.runId` = the message's `runId` (RFC 018);
+  - `payload.failureClass` = `F0_NONE` (expiry is an audit record, not a run failure);
+  - `payload.details` = `{ "messageId": ..., "expiresAt": ..., "disposition":
+    "expired_dropped" }`;
+  - envelope `correlationId` = the message's `correlationId` (RFC 018).
+- **Scope of the obligation.** The journaling SHOULD applies to run-correlated messages
+  (those carrying `runId` per RFC 018). A message with no run context cannot satisfy the
+  closed journal payload's required `runId`; for such messages, expiry journaling is
+  OPTIONAL and deployment-specific. This limitation is stated rather than papered over;
+  widening the journal payload is out of scope here.
 
 ## Reference
 
