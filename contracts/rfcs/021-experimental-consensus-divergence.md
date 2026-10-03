@@ -48,6 +48,19 @@ for these (and future) experimental operations:
 `listDivergenceAlerts` graduates under bars 1 and 2; it does not share the request-shape
 repair in bar 3.
 
+### Observed implementation pattern
+
+The proposal shape in bar 3 is not hypothetical. In the 447-run crosswalk of the public
+`replication-project` corpus (2026-10-03), replications were adjudicated by panels of
+independent LLM judges with recorded vote splits — a unanimous 4–0 panel (BVBRC-73), a
+2:1 majority (BVBRC-81), a three-judge panel (BVBRC-76), and a five-model split panel
+(OSTI-3374566). Those panels exhibit exactly the fields a repaired request needs
+(participants, the question and candidate options, a decision policy) and the fields the
+response must carry (the result plus per-judge votes and judge identities — judge drift
+is as real as database drift). They also supply bar 2's shared fixture set: real
+proposals and real decisions, drawn from runs that exist, rather than canned responses
+authored for the spec.
+
 ## Reference
 
 Surfaced by the ARIA v3 ↔ Academy integration mapping (2026-10-01), §5.6.
