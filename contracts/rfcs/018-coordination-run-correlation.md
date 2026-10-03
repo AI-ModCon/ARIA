@@ -18,12 +18,19 @@ is an open object, so an envelope convention could carry correlation for message
   `fixtures/v3/handoff.request.json`) remain valid.
 - Add optional attenuation references to `Handoff`: `capabilityTokenRef` (a
   [`capability-token.schema.json`](../schemas/common/capability-token.schema.json)
-  `tokenId` the receiving agent operates under) and `budgetRef` (allocation id from
-  `allocateBudget`). Attenuation semantics stay in the token (`scope`, `delegation`); the
-  handoff only references them.
+  `tokenId` the receiving agent operates under) and `budgetRef` (the
+  [`budget-policy.schema.json`](../schemas/common/budget-policy.schema.json) `budgetId`
+  returned by `allocateBudget` — not a usage-meter id). Attenuation semantics stay in the
+  token (`scope`, `delegation`); the handoff only references them.
+- Normative: **a handoff that sets `capabilityTokenRef` does not grant that token.** The
+  receiving workload must present the referenced token and pass the ordinary use-time
+  check — bearer is the token `subject`, token unexpired, token unrevoked, delegator
+  still entitled. The handoff record is a pointer for audit and correlation, never a
+  credential.
 - Normative rule: when emitted in the context of a Run, `runId` MUST be set and
-  `correlationId` SHOULD match the chain used in `appendEvent` payloads, so journal
-  queries reconstruct cross-agent causality.
+  `correlationId` SHOULD match the `correlationId` on the corresponding `appendEvent`
+  envelopes (the event envelope's correlation field, not an ad hoc payload key), so
+  journal queries reconstruct cross-agent causality.
 - Rejected alternative: a blessed `payload` envelope — impossible for `Handoff` (no
   payload field) and invisible to schema validation.
 
