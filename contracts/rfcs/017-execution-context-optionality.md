@@ -16,7 +16,7 @@ provenance value the fields exist to provide.
   all existing payloads remain valid). `configHash` and `environmentHash` stay required —
   every run type has a configuration and an environment.
 - Add an optional **`runClass`** discriminator to `execution-context.schema.json`:
-  `enum [reproducible, operational]`. This is a property of the submitted run, not of
+  `enum [reproducible, analysis, operational]`. This is a property of the submitted run, not of
   the capability — `reproducibilityTiers` in `core-v3.json` (declared / smoke-tested /
   independently replicated) is a capability **maturity** claim and is deliberately not
   used here, since a smoke-tested data-movement capability must not be forced to carry a
@@ -25,17 +25,34 @@ provenance value the fields exist to provide.
   profile interpretation:
 
   ```json
-  "if":   { "properties": { "runClass": { "const": "reproducible" } },
-            "required": ["runClass"] },
-  "then": { "required": ["seedList", "dataVersion"] }
+  "allOf": [
+    { "if":   { "properties": { "runClass": { "const": "reproducible" } },
+                "required": ["runClass"] },
+      "then": { "required": ["seedList", "dataVersion"] } },
+    { "if":   { "properties": { "runClass": { "const": "analysis" } },
+                "required": ["runClass"] },
+      "then": { "required": ["dataVersion"] } }
+  ]
   ```
 
-  A `runClass: reproducible` fixture that omits `seedList` fails validation; a
-  `runClass: operational` (or class-less) fixture that omits it passes. The base
-  `required` array is not re-widened.
+  A `runClass: reproducible` fixture that omits `seedList` fails validation; an
+  `analysis` fixture that omits `dataVersion` fails; an `operational` (or class-less)
+  fixture that omits both passes. The base `required` array is not re-widened.
+
+  The middle class is motivated by measurement. In a crosswalk of the 447 agent
+  paper-replications in the public `replication-project` corpus (2026-10-03),
+  tool/database version drift was the largest cause of explained divergences — an
+  AMRFinderPlus 3.8.4→4.2.7 upgrade reversed a published AMR association
+  (BVBRC-109), and antiSMASH v5→v6 shifted BGC counts (BVBRC-86, BVBRC-72) — and the
+  affected runs are deterministic screens that carry no meaningful seed. Under a
+  binary split those runs must either placeholder a seed (recreating the problem
+  this RFC exists to stop) or drop `dataVersion`, the one field whose absence
+  demonstrably costs reproducibility. `analysis` = deterministic computation over
+  versioned external data; `reproducible` = stochastic computation where seeds and
+  data versions both bind.
 - Profile hook: profiles that host reproducibility-bearing science (e.g. the RFC 016
   `evals` module, or a deployment profile for simulation campaigns) add a compliance
-  check **`execution_context_run_class_enforced`**, evaluated against fixtures of both
+  check **`execution_context_run_class_enforced`**, evaluated against fixtures of all three
   classes as above. `minimal-core-v3` does not require `runClass` to be present.
 - Normative omission rule, carried in the schema `description` of both fields (removing
   them from `required` does not by itself reject `[0]` or `"n/a"`): *"When semantically
