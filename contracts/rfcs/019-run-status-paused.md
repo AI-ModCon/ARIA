@@ -19,12 +19,33 @@ RFC adds the `paused` analogues.)
 
 ## Proposal
 
-- Add `paused` to the `status` enum in `run.schema.json`. This RFC supplies the concrete
+- Add `paused` to the `status` enum in the Run schema. This RFC supplies the concrete
   case; general rules for status-vocabulary growth defer to RFC 003.
 - Add `paused` to the payload `status` enum and `run.paused` / `run.resumed` to the
-  `eventType` enum in `run-lifecycle-event.schema.json`.
-- Mapping rule: Run `status: paused` ⇔ `workflowState.status` ∈ {`paused`, `resumable`};
-  `resumeRun` returns the Run to `running`. `workflow-state.schema.json` is unchanged.
+  `eventType` enum in the run-lifecycle event schema.
+- Mapping rule, stated as schema constraints rather than a biconditional over an optional
+  field (`workflowState` is optional today, so without this a document could claim
+  `paused` with no workflow state, or `running` while `workflowState.status` says
+  `paused`):
+  - `status: paused` REQUIRES `workflowState` to be present with
+    `workflowState.status` ∈ {`paused`, `resumable`} — enforced with an in-schema
+    `if`/`then` (`if status == paused then required: [workflowState]` plus the
+    `workflowState.status` restriction).
+  - `resumeRun` returns the Run `status` to `running`.
+  - Run `status` does **not** distinguish `paused` from `resumable`; that distinction
+    lives only on `workflowState.status`.
+- `workflow-state.schema.json` is unchanged.
+
+## Landing (file-level)
+
+Per the v4 profile turn (RFC 016 versioning note), these edits land on **v4 copies**, not
+in place: `schemas/v4/run.schema.json` and `schemas/v4/run-lifecycle-event.schema.json`.
+Because the current [`event-envelope.schema.json`](../schemas/events/event-envelope.schema.json)
+`oneOf` references `./run-lifecycle-event.schema.json`, a v4 lifecycle schema is invisible
+to `appendEvent` until the envelope points at it: the landing therefore **also adds
+`schemas/v4/event-envelope.schema.json`** whose `oneOf` references the v4 lifecycle
+schema, and `gmp-core-v4.yaml` routes `appendEvent` / `listEvents` through that v4
+envelope. The v3 files are untouched; existing v3 documents remain valid.
 
 ## Reference
 
