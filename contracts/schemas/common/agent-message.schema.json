@@ -11,7 +11,17 @@
     "kind": { "type": "string", "enum": ["task", "handoff", "query", "result", "control"] },
     "payload": { "type": "object", "additionalProperties": true },
     "sentAt": { "type": "string", "format": "date-time" },
-    "expiresAt": { "type": "string", "format": "date-time" }
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Run on whose behalf this message is sent; MUST be set when emitted in the context of a Run. (RFC 018)"
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "SHOULD match the correlationId of the corresponding appendEvent records (the event envelope's correlation field, not an ad hoc payload key), so journal queries reconstruct cross-agent causality. (RFC 018)"
+    }
   },
   "additionalProperties": false
 }

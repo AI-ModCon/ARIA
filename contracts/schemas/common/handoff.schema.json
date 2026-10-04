@@ -10,7 +10,27 @@
     "toAgentId": { "type": "string", "minLength": 1 },
     "taskRef": { "type": "string", "minLength": 1 },
     "reason": { "type": "string", "minLength": 1 },
-    "createdAt": { "type": "string", "format": "date-time" }
+    "createdAt": { "type": "string", "format": "date-time" },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Run on whose behalf this handoff is made; MUST be set when emitted in the context of a Run. (RFC 018)"
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "SHOULD match the correlationId of the corresponding appendEvent records (the event envelope's correlation field, not an ad hoc payload key). (RFC 018)"
+    },
+    "capabilityTokenRef": {
+      "type": "string",
+      "minLength": 1,
+      "description": "tokenId of the capability token (capability-token.schema.json) the receiving workload operates under. The handoff record is not a credential: setting this field does not grant the token, and the receiver must present the token and pass the ordinary use-time checks (bearer is the token subject, token unexpired, token unrevoked, delegator still entitled). Attenuation stays in the token's scope and delegation. (RFC 018)"
+    },
+    "budgetRef": {
+      "type": "string",
+      "minLength": 1,
+      "description": "BudgetPolicy.budgetId of the allocation (from allocateBudget) the handed-off work draws against; not a usage-meter id. (RFC 018)"
+    }
   },
   "additionalProperties": false
 }
