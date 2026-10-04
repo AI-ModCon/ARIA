@@ -87,7 +87,7 @@
     },
     "planId": {
       "type": "string",
-      "description": "Optional plan identifier returned by POST /v3/runs:plan when negotiation preflight was used."
+      "description": "Optional plan identifier returned by POST /v4/runs:plan when negotiation preflight was used."
     },
     "planRef": {
       "type": "string",
@@ -107,5 +107,40 @@
       "$ref": "../common/workflow-state.schema.json"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "paused"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "workflowState"
+        ],
+        "properties": {
+          "workflowState": {
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "paused",
+                  "resumable"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "description": "A Run with status \"paused\" MUST embed workflowState with status \"paused\" or \"resumable\"; Run status does not distinguish the two (that distinction lives on workflowState). resumeRun returns status to \"running\". (RFC 019)"
 }

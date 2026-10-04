@@ -875,7 +875,7 @@ paths:
       description: >-
         Accepts the RFC 005 append projection. Clients MUST omit eventId, occurredAt, and
         source; the server populates them and normalizes the event into the canonical
-        GmpEvent shape (event-envelope.schema.json) before persistence. The normalized
+        GmpEvent shape (schemas/v4/event-envelope.schema.json) before persistence. The normalized
         event is validated against the oneOf branch matching its eventType; violations
         return 422. Append is at-least-once: the server does not de-duplicate, and each
         accepted request produces a new eventId.
@@ -1002,7 +1002,7 @@ components:
         RFC 005 append projection. Clients send only fields the server cannot infer;
         eventId, occurredAt, and source MUST be omitted (server-populated). The stored
         event validates against the canonical GmpEvent oneOf
-        (event-envelope.schema.json); per-eventType payload shapes are enforced
+        (schemas/v4/event-envelope.schema.json); per-eventType payload shapes are enforced
         server-side, not at the DTO level.
       required: [eventType, payload]
       properties:
@@ -1035,7 +1035,7 @@ components:
       description: >-
         RFC 005 list projection of a stored GmpEvent. Query-index fields (runId, agentId)
         and sidecar metadata are a read-model convenience; each item validates as a
-        GmpEvent (event-envelope.schema.json) after stripping metadata and normalizing
+        GmpEvent (schemas/v4/event-envelope.schema.json) after stripping metadata and normalizing
         index fields into the matching oneOf branch.
       required: [eventId, eventType, occurredAt, source, payload]
       properties:
@@ -1052,7 +1052,7 @@ components:
         payload:
           type: object
           description: >-
-            Opaque at the DTO level; typed per the event-envelope.schema.json oneOf
+            Opaque at the DTO level; typed per the schemas/v4/event-envelope.schema.json oneOf
             branch.
         correlationId:
           type: string
