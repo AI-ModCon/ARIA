@@ -43,15 +43,18 @@
     },
     "expiresAt": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Optional TTL; absent means no TTL. The implementation that accepted the message at sendAgentMessage (the party that returned 202) MUST NOT deliver it after expiresAt; transports it hands the message to inherit the obligation. An expired undelivered run-correlated message is dropped and SHOULD be journaled as journal.message.expired (see the v4 journal envelope schema). (RFC 020)"
     },
     "runId": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Run on whose behalf this message is sent; MUST be set when emitted in the context of a Run. (RFC 018)"
     },
     "correlationId": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "SHOULD match the correlation field of the corresponding appendEvent records, so journal queries reconstruct cross-agent causality. (RFC 018)"
     }
   },
   "additionalProperties": false

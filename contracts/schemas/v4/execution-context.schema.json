@@ -21,11 +21,13 @@
       "minItems": 1,
       "items": {
         "type": "integer"
-      }
+      },
+      "description": "Required when runClass is 'reproducible'. When semantically inapplicable this field MUST be omitted, never filled with a placeholder; placeholder values (e.g. [0]) are a conformance failure of the submitting implementation. (RFC 017)"
     },
     "dataVersion": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Required when runClass is 'reproducible' or 'analysis'. When semantically inapplicable this field MUST be omitted, never filled with a placeholder (e.g. \"n/a\"); placeholder values are a conformance failure of the submitting implementation. (RFC 017)"
     },
     "toolchain": {
       "type": "string"
@@ -40,7 +42,53 @@
           "null"
         ]
       }
+    },
+    "runClass": {
+      "type": "string",
+      "enum": [
+        "reproducible",
+        "analysis",
+        "operational"
+      ],
+      "description": "Class of the submitted run, not of the capability: 'reproducible' = stochastic computation where seeds and data versions both bind; 'analysis' = deterministic computation over versioned external data; 'operational' = data movement, instrument control, service calls. Conditional field requirements follow this class. (RFC 017)"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "runClass": {
+            "const": "reproducible"
+          }
+        },
+        "required": [
+          "runClass"
+        ]
+      },
+      "then": {
+        "required": [
+          "seedList",
+          "dataVersion"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "runClass": {
+            "const": "analysis"
+          }
+        },
+        "required": [
+          "runClass"
+        ]
+      },
+      "then": {
+        "required": [
+          "dataVersion"
+        ]
+      }
+    }
+  ]
 }
