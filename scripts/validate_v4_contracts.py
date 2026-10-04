@@ -125,6 +125,8 @@ def main() -> int:
         "execution-attempt-scheduler.json": SCHEMA_ATTEMPT,
         "execution-attempt-globus-compute.json": SCHEMA_ATTEMPT,
         "execution-attempt-globus-transfer.json": SCHEMA_ATTEMPT,
+        "execution-context-analysis.request.json": SCHEMAS_V4 / "execution-context.schema.json",
+        "journal-message-expired.event.json": SCHEMAS_V4 / "journal-envelope-event.schema.json",
     }
     for fixture_name, schema_path in direct_mappings.items():
         fixture_path = FIXTURES_V4 / fixture_name
@@ -166,6 +168,111 @@ def main() -> int:
                 f"loosening in v4 variant of {v3_schema_path.name} is not effective"
             )
 
+    # 8) deep constraint checks the v3 engine skips: pattern, const, if/then
+    import re as _re
+
+    def _resolve(schema, path):
+        if "$ref" in schema:
+            target = (path.parent / schema["$ref"]).resolve()
+            return v3._read_json(target), target
+        return schema, path
+
+    def _deep_ok(instance, schema, path, trail):
+        schema, path = _resolve(schema, path)
+        errs = []
+        for sub in schema.get("allOf", []):
+            errs += _deep_ok(instance, sub, path, trail)
+        if "if" in schema:
+            if _if_matches(instance, schema["if"], path):
+                then = schema.get("then")
+                if then:
+                    errs += _required_errs(instance, then, trail)
+                    errs += _deep_ok(instance, then, path, trail)
+        if "oneOf" in schema:
+            # accept if any branch deep-checks clean AND basic-validates
+            branch_errs = []
+            ok = False
+            for sub in schema["oneOf"]:
+                sub_r, sub_p = _resolve(sub, path)
+                be = v3._validate_instance(instance, sub_r, sub_p, trail, schemas_by_id, schemas_by_path)
+                de = _deep_ok(instance, sub_r, sub_p, trail)
+                if not be and not de:
+                    ok = True
+                    break
+                branch_errs += be + de
+            if not ok:
+                errs.append(f"{trail}: no oneOf branch satisfies deep constraints")
+        if isinstance(instance, dict):
+            if "const" in schema and instance != schema["const"]:
+                errs.append(f"{trail}: const mismatch")
+            for key, sub in schema.get("properties", {}).items():
+                if key in instance:
+                    errs += _deep_ok(instance[key], sub, path, f"{trail}.{key}")
+        elif isinstance(instance, list):
+            items = schema.get("items")
+            if items:
+                for i, el in enumerate(instance):
+                    errs += _deep_ok(el, items, path, f"{trail}[{i}]")
+        elif isinstance(instance, str):
+            pat = schema.get("pattern")
+            if pat and not _re.fullmatch(pat, instance):
+                errs.append(f"{trail}: '{instance[:40]}' does not match pattern {pat}")
+            if "const" in schema and instance != schema["const"]:
+                errs.append(f"{trail}: const mismatch")
+        else:
+            if "const" in schema and instance != schema["const"]:
+                errs.append(f"{trail}: const mismatch")
+        return errs
+
+    def _if_matches(instance, cond, path):
+        cond, path = _resolve(cond, path)
+        if not isinstance(instance, dict):
+            return False
+        for req in cond.get("required", []):
+            if req not in instance:
+                return False
+        for key, sub in cond.get("properties", {}).items():
+            if key in instance:
+                sub, _ = _resolve(sub, path)
+                if "const" in sub and instance[key] != sub["const"]:
+                    return False
+        return True
+
+    def _required_errs(instance, then, trail):
+        errs = []
+        if isinstance(instance, dict):
+            for req in then.get("required", []):
+                if req not in instance:
+                    errs.append(f"{trail}: conditional requires '{req}'")
+        return errs
+
+    for fixture_name, schema_path in direct_mappings.items():
+        fixture_path = FIXTURES_V4 / fixture_name
+        if not fixture_path.exists() or not schema_path.exists():
+            continue
+        errors.extend(_deep_ok(v3._read_json(fixture_path), v3._read_json(schema_path),
+                               schema_path.resolve(), fixture_name))
+
+    # 9) conditional/negative checks: deliberately broken variants must fail
+    run_fx = v3._read_json(FIXTURES_V4 / "run-paused.response.json")
+    broken = dict(run_fx); broken.pop("workflowState", None)
+    if not _deep_ok(broken, v3._read_json(SCHEMAS_V4 / "run.schema.json"),
+                    (SCHEMAS_V4 / "run.schema.json").resolve(), "run-paused-minus-workflowState"):
+        errors.append("paused run without workflowState unexpectedly passes the v4 run schema")
+
+    ec_fx = v3._read_json(FIXTURES_V4 / "execution-context-analysis.request.json")
+    broken = dict(ec_fx); broken.pop("dataVersion", None)
+    if not _deep_ok(broken, v3._read_json(SCHEMAS_V4 / "execution-context.schema.json"),
+                    (SCHEMAS_V4 / "execution-context.schema.json").resolve(), "analysis-minus-dataVersion"):
+        errors.append("analysis context without dataVersion unexpectedly passes the v4 schema")
+
+    jm = v3._read_json(FIXTURES_V4 / "journal-message-expired.event.json")
+    v3_journal = CONTRACTS / "schemas" / "events" / "journal-envelope-event.schema.json"
+    if not v3._validate_instance(jm, v3._read_json(v3_journal), v3_journal.resolve(),
+                                 "journal-expired-vs-v3", schemas_by_id, schemas_by_path):
+        errors.append("journal.message.expired unexpectedly passes the v3 journal schema "
+                      "— the new eventType should only be reachable via the v4 envelope")
+
     if errors:
         print("v4 contract validation FAILED:")
         for err in errors:
@@ -177,8 +284,8 @@ def main() -> int:
         f"{len(ops_v4)} operations ({len(minimal_ops)} minimal, {len(module_ops)} module, "
         f"{len(experimental_ops)} experimental), {len(modules)} modules, "
         f"{len(federation['conformanceLevels'])} conformance levels, "
-        f"{len(direct_mappings)} fixtures validated, "
-        f"{len(negative_cases)} v3-loosening checks passed"
+        f"{len(direct_mappings)} fixtures validated (deep pattern/conditional checks on), "
+        f"{len(negative_cases) + 3} negative checks passed"
     )
     return 0
 
