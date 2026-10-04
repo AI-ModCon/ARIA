@@ -30,11 +30,12 @@ at least two administrative domains: delegated authority attenuates across the h
 chain, an independent evaluator catches a seeded bad result, and supervision queues and
 interventions operate across sites.
 
-**C4 — production, cross-org-live evidence.** All modules, including `coordination` and
-`memory`. Evidence includes cross-organization campaigns with complete provenance,
+**C4 — production, cross-org-live evidence.** Every module's `requiredOperations`,
+including `coordination` and `memory`, and excluding experimental operations. A legacy
+`core-v3` deployment is a C4 deployment plus the two experimental operations
+`core-v3.json` obliged it to serve (typically as stubs). Evidence includes cross-organization campaigns with complete provenance,
 demonstrated revocation and disaster recovery, and a security review against the exact
-release candidate. C4 corresponds to the full surface that `core-v3` mandated for
-everyone; in v4 it is the ceiling, not the floor.
+release candidate. In v4, C4 is the ceiling, not the floor.
 
 Experimental operations (`resolveAgentConsensus`, `listDivergenceAlerts`) are not
 required at any level; they graduate per the release-governance process once two

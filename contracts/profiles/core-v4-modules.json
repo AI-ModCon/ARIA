@@ -58,7 +58,10 @@
       "requiredSchemas": [
         "../schemas/common/eval-result.schema.json"
       ],
-      "complianceChecks": []
+      "complianceChecks": [
+        "reasoning_trace_queryable"
+      ],
+      "notes": "reasoning_trace_queryable lives here, not on the minimal floor: it requires reasoning-node events to exist and be retrievable by correlation, which a deployment with no reasoning workloads cannot evidence. (RFC 016)"
     },
     "coordination": {
       "requiredOperations": [

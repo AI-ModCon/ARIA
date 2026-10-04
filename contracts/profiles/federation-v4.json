@@ -4,9 +4,18 @@
   "extendsProfileId": "core-v4-minimal",
   "description": "Cross-trust-domain federation profile with tiered conformance levels C0-C4. See federation-v4.md for level definitions.",
   "constraints": {
-    "payloadSerialization": "json-only",
-    "delegationChainMaterialized": true,
-    "revocationCheckPerHop": true
+    "payloadSerialization": {
+      "value": "json-only",
+      "check": "Every cross-domain AgentMessage.payload, handoff-referenced artefact, and action argument object MUST validate as JSON; a fixture whose payload contains a serialized-object blob (e.g. base64 pickle) MUST be rejected by the receiving deployment."
+    },
+    "delegationChainMaterialized": {
+      "value": true,
+      "check": "Every capability token presented across a trust-domain boundary MUST carry delegation.delegationChain with one entry per delegation hop from the human principal to the presenting workload; a token whose chain omits an intermediate hop MUST be refused at use time."
+    },
+    "revocationCheckPerHop": {
+      "value": true,
+      "check": "At every use of a capability token, each delegation hop in the chain MUST be re-checked against revocation state; a token whose intermediate delegator has been revoked MUST be denied even if the leaf token itself is unexpired and unrevoked."
+    }
   },
   "conformanceLevels": {
     "C0": {

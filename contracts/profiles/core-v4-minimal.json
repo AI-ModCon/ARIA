@@ -33,7 +33,9 @@
     "../schemas/v4/execution-context.schema.json",
     "../schemas/v4/run-lifecycle-event.schema.json",
     "../schemas/events/event-envelope-base.schema.json",
-    "../schemas/events/failure-taxonomy.schema.json"
+    "../schemas/events/failure-taxonomy.schema.json",
+    "../schemas/v4/event-envelope.schema.json",
+    "../schemas/v4/journal-envelope-event.schema.json"
   ],
   "reproducibilityTiers": {
     "tier1_declared": {
@@ -53,8 +55,7 @@
     "failure_taxonomy_consistent",
     "schema_examples_present",
     "identity_revocation_enforced",
-    "idempotency_required_on_mutations",
-    "reasoning_trace_queryable"
+    "idempotency_required_on_mutations"
   ],
   "extensionPolicy": {
     "allowed": true,
