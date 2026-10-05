@@ -64,15 +64,53 @@ def _matches_type(value: object, expected_type: str) -> bool:
     return True
 
 
-def _resolve_pointer(document: dict, pointer: str) -> dict | None:
-    """Walk an RFC 6901 JSON pointer (e.g. '/properties/defaultTier') within a document."""
-    if pointer in ("", "/"):
-        return document
+class PointerError(ValueError):
+    """A JSON pointer is syntactically invalid or does not name a usable subschema."""
+
+
+def _unescape_token(token: str) -> str:
+    """RFC 6901 section 4 unescaping. Order matters: '~1' before '~0'.
+
+    Unescaping '~0' first would rewrite '~01' to '~1' and then to '/', losing the
+    literal '~1' the author encoded.
+    """
+    return token.replace("~1", "/").replace("~0", "~")
+
+
+def _is_array_index(token: str) -> bool:
+    """RFC 6901 section 4 array index: '0', or [1-9][0-9]* with no leading zero.
+
+    str.isdigit() alone is too permissive: it accepts leading zeros ('01') and
+    non-ASCII digits.
+    """
+    if not token.isascii() or not token.isdigit():
+        return False
+    return token == "0" or not token.startswith("0")
+
+
+def _resolve_pointer(document: object, pointer: str) -> dict | None:
+    """Resolve an RFC 6901 JSON pointer against a document.
+
+    Returns the referenced subschema, or None when the pointer is well formed but
+    names no such member. Raises PointerError when the pointer is syntactically
+    invalid or resolves to something that is not an object subschema, so a typo
+    surfaces as an error instead of silently resolving.
+
+    '' and '/' are different pointers: '' is the whole document, '/' is the
+    member whose key is the empty string.
+    """
+    if pointer == "":
+        return document if isinstance(document, dict) else None
+    if not pointer.startswith("/"):
+        raise PointerError(
+            f"JSON pointer '{pointer}' must be empty or begin with '/' (RFC 6901 section 3)"
+        )
     current: object = document
-    for raw_token in pointer.lstrip("/").split("/"):
-        token = raw_token.replace("~1", "/").replace("~0", "~")
+    # Split after the leading '/' only; '//x' is the two tokens ['', 'x'], not ['x'].
+    for raw_token in pointer.split("/")[1:]:
+        token = _unescape_token(raw_token)
         if isinstance(current, list):
-            if not token.isdigit() or int(token) >= len(current):
+            if not _is_array_index(token) or int(token) >= len(current):
                 return None
             current = current[int(token)]
         elif isinstance(current, dict):
@@ -81,15 +119,25 @@ def _resolve_pointer(document: dict, pointer: str) -> dict | None:
             current = current[token]
         else:
             return None
-    return current if isinstance(current, dict) else None
+    if not isinstance(current, dict):
+        raise PointerError(
+            f"JSON pointer '{pointer}' resolves to {type(current).__name__}, not an object subschema"
+        )
+    return current
 
 
 def _resolve_ref(ref: str, current_schema_path: Path, schemas_by_id: dict[str, dict], schemas_by_path: dict[Path, dict]) -> tuple[dict | None, Path | None]:
-    base, _, pointer = ref.partition("#")
+    """Resolve a $ref to a subschema. Raises PointerError on a malformed pointer."""
+    base, has_fragment, pointer = ref.partition("#")
     if not base:
-        # Same-document pointer; resolve against the document currently being walked.
+        # Same-document reference.
+        if not has_fragment:
+            raise PointerError(f"$ref '{ref}' is empty")
+        if pointer == "":
+            # '#' is the current document root; validating it would recurse forever.
+            raise PointerError("$ref '#' (self-reference to document root) is not supported")
         document = schemas_by_path.get(current_schema_path.resolve())
-        if document is None or not pointer:
+        if document is None:
             return None, None
         return _resolve_pointer(document, pointer), current_schema_path
     if base.startswith("http://") or base.startswith("https://"):
@@ -98,7 +146,10 @@ def _resolve_ref(ref: str, current_schema_path: Path, schemas_by_id: dict[str, d
     else:
         target_path = (current_schema_path.parent / base).resolve()
         document = schemas_by_path.get(target_path)
-    if document is None or not pointer:
+    if document is None:
+        return None, target_path
+    if not has_fragment or pointer == "":
+        # No fragment, or an empty pointer, both name the whole document.
         return document, target_path
     return _resolve_pointer(document, pointer), target_path
 
@@ -117,7 +168,10 @@ def _validate_instance(
         ref = schema["$ref"]
         if not isinstance(ref, str):
             return [f"{context}: invalid $ref type"]
-        resolved, resolved_path = _resolve_ref(ref, schema_path, schemas_by_id, schemas_by_path)
+        try:
+            resolved, resolved_path = _resolve_ref(ref, schema_path, schemas_by_id, schemas_by_path)
+        except PointerError as exc:
+            return [f"{context}: invalid $ref '{ref}': {exc}"]
         if resolved is None:
             return [f"{context}: unresolved $ref '{ref}'"]
         next_path = resolved_path if resolved_path is not None else schema_path
@@ -228,8 +282,91 @@ def _validate_instance(
     return errors
 
 
+def _pointer_self_test() -> list[str]:
+    """Check _resolve_pointer against RFC 6901 semantics.
+
+    The resolver is exercised by only one production $ref today
+    ('model-routing-policy.schema.json#/properties/defaultTier'), which would
+    still pass under several incorrect implementations. These cases pin the
+    general behaviour so a future fragment $ref cannot rely on a silent bug.
+    Runs on every invocation; stdlib only, no test framework.
+    """
+    # Values are objects because _resolve_pointer only returns object subschemas.
+    root = {"rootMarker": True}
+    empty_key = {"emptyKeyMarker": True}
+    nested_empty = {"nestedEmptyMarker": True}
+    slash_key = {"slashKeyMarker": True}
+    tilde_key = {"tildeKeyMarker": True}
+    tilde_one_key = {"tildeOneMarker": True}
+    item0 = {"itemMarker": 0}
+    item1 = {"itemMarker": 1}
+    doc = dict(root)
+    doc.update(
+        {
+            "": empty_key,
+            "a/b": slash_key,
+            "m~n": tilde_key,
+            "~1": tilde_one_key,
+            "arr": [item0, item1],
+            "properties": {"defaultTier": {"enum": ["cheap_fast"]}},
+            "nested": {"": nested_empty},
+            "scalar": 7,
+        }
+    )
+    doc[""] = empty_key
+    empty_key["deep"] = nested_empty
+
+    # (pointer, expected) where expected is an object, None (no such member),
+    # or PointerError (malformed pointer / non-object target).
+    cases: list[tuple[str, object]] = [
+        ("", doc),                                  # whole document
+        ("/", empty_key),                           # member with the empty key, NOT the root
+        ("//deep", nested_empty),                   # tokens ['', 'deep']
+        ("/nested/", nested_empty),                 # trailing empty token
+        ("/a~1b", slash_key),                       # ~1 unescapes to '/'
+        ("/m~0n", tilde_key),                       # ~0 unescapes to '~'
+        ("/~01", tilde_one_key),                    # ~01 is literal '~1', not '/'
+        ("/arr/0", item0),                          # array index
+        ("/arr/1", item1),
+        ("/properties/defaultTier", doc["properties"]["defaultTier"]),
+        ("/arr/2", None),                           # index out of range
+        ("/arr/01", None),                          # leading zero is not an index
+        ("/arr/-", None),                           # '-' (append) names no member
+        ("/missing", None),                         # absent key
+        ("/scalar/deeper", None),                   # cannot descend through a scalar
+        ("properties/defaultTier", PointerError),   # missing leading '/'
+        ("a", PointerError),
+        ("/scalar", PointerError),                  # resolves to a non-object
+    ]
+
+    failures: list[str] = []
+    for pointer, expected in cases:
+        try:
+            got: object = _resolve_pointer(doc, pointer)
+        except PointerError:
+            got = PointerError
+        if expected is PointerError:
+            if got is not PointerError:
+                failures.append(f"pointer {pointer!r}: expected PointerError, got {got!r}")
+        elif expected is None:
+            if got is not None:
+                failures.append(f"pointer {pointer!r}: expected None, got {got!r}")
+        elif got is not expected:
+            failures.append(f"pointer {pointer!r}: expected {expected!r}, got {got!r}")
+
+    if _unescape_token("~01") != "~1":
+        failures.append("unescape order wrong: '~01' must become '~1', not '/'")
+    for token, want in (("0", True), ("10", True), ("01", False), ("", False), ("-", False), ("1x", False)):
+        if _is_array_index(token) is not want:
+            failures.append(f"array index check wrong for {token!r}: expected {want}")
+
+    return [f"Pointer self-test: {f}" for f in failures]
+
+
 def main() -> int:
     errors: list[str] = []
+
+    errors.extend(_pointer_self_test())
 
     if not OPENAPI_V3.exists():
         errors.append(f"Missing required API spec: {OPENAPI_V3}")
