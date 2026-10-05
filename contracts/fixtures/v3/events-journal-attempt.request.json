@@ -1,0 +1,16 @@
+{
+  "eventId": "evt_journal_02",
+  "eventType": "journal.run.started",
+  "occurredAt": "2026-10-01T14:58:12Z",
+  "source": "gateway-anl-01",
+  "correlationId": "run-7f3e2a",
+  "payload": {
+    "runId": "run-7f3e2a",
+    "failureClass": "F0_NONE",
+    "details": {
+      "attemptId": "attempt-scheduler-001",
+      "externalSystemType": "scheduler",
+      "externalTaskId": "slurm-9241337"
+    }
+  }
+}

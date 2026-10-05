@@ -1,6 +1,6 @@
 {
   "profileId": "core-v3-companion",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Optional bundle: mandates spine core-v3 artefacts plus CampaignPlan / DataMovementIntent / EvalPublication / RunInvocation companion JSON Schemas for cross-enterprise interoperability.",
   "requiredApiSpec": "../openapi/gmp-core-v3.yaml",
   "requiredOperations": [
@@ -92,7 +92,8 @@
     "../companion/schemas/campaign-plan.schema.json",
     "../companion/schemas/data-movement-intent.schema.json",
     "../companion/schemas/eval-publication.schema.json",
-    "../companion/schemas/run-invocation.schema.json"
+    "../companion/schemas/run-invocation.schema.json",
+    "../companion/schemas/execution-attempt.schema.json"
   ],
   "reproducibilityTiers": {
     "tier1_declared": {

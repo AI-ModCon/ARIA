@@ -1,0 +1,27 @@
+{
+  "eventId": "evt_tool_02",
+  "eventType": "tool.call",
+  "occurredAt": "2026-10-05T14:22:31Z",
+  "source": "agent.support.refunds",
+  "correlationId": "run_01K3RUN0001",
+  "payload": {
+    "runId": "run_01K3RUN0001",
+    "toolName": "crm.fetchOrders",
+    "status": "succeeded",
+    "latencyMs": 182,
+    "tokenCost": 140,
+    "inputTokens": 96,
+    "outputTokens": 44,
+    "modelId": "claude-sonnet-4-5",
+    "provider": "bedrock",
+    "modelTier": "balanced",
+    "spendUsd": 0.00231,
+    "uncertainty": {
+      "basis": "logprob-calibrated",
+      "scalarConfidence": 0.82,
+      "distributionType": "epistemic_interval",
+      "abstainRecommended": false
+    },
+    "attemptId": "attempt-scheduler-001"
+  }
+}

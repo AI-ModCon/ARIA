@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/companion/schemas/execution-attempt.schema.json",
+  "title": "ExecutionAttempt",
+  "description": "Companion record linking one Run attempt to an external task identity (scheduler job via IRI, Globus Compute task, Globus Transfer task). Invariant: at most one non-terminal attempt per (runId, targetId) when targetId is set, otherwise per (runId, externalSystem.type); a fan-out Run legitimately has one concurrent attempt per target. Retries are further attempts of the same Run: retryRun appends an ExecutionAttempt on the same runId with supersedesAttemptId set and MUST NOT mint a new Run. Reconciliation: after restart the owning gateway MUST reconcile every non-terminal attempt against the external system before creating new attempts (converge to a terminal state or mark 'lost' with lastReconciledAt updated); orphaned external tasks are journaled and cancelled per site policy. Deployments adopting core-v3-companion MUST be able to list ExecutionAttempt artefacts by runId; journal.* events carry payload.details.attemptId and tool.call events carry payload.attemptId. (RFC 022)",
+  "type": "object",
+  "required": ["attemptId", "runId", "externalSystem", "externalTaskId", "status", "createdAt"],
+  "properties": {
+    "attemptId": { "type": "string", "minLength": 1 },
+    "runId": { "type": "string", "minLength": 1, "description": "Run this attempt executes; stable across retries. Lookup key for listing attempts." },
+    "targetId": { "type": "string", "minLength": 1, "description": "Optional Run.targets[].targetId this attempt executes for. When set, the one-non-terminal-attempt invariant is scoped to (runId, targetId) so a fan-out Run can hold one concurrent attempt per target." },
+    "externalSystem": {
+      "type": "object",
+      "required": ["type", "endpoint"],
+      "properties": {
+        "type": { "type": "string", "enum": ["scheduler", "globus_compute", "globus_transfer", "other"] },
+        "endpoint": { "type": "string", "format": "uri", "description": "Service endpoint the external task lives on, e.g. an IRI facility API, a Globus Compute endpoint, or a Globus Transfer API base." }
+      },
+      "additionalProperties": false
+    },
+    "externalTaskId": { "type": "string", "minLength": 1, "description": "Native identifier in the external system (Slurm/PBS job id, Globus Compute task id, Globus Transfer task id)." },
+    "externalTaskUri": { "type": "string", "format": "uri", "description": "Optional IRI-resolvable task or job URI." },
+    "status": {
+      "type": "string",
+      "enum": ["submitted", "running", "succeeded", "failed", "cancelled", "lost"],
+      "description": "Projection of external task state. Required: both the one-non-terminal-attempt invariant and the reconciliation rule turn on whether an attempt is terminal, which cannot be decided for an attempt with no status. Terminal states are succeeded, failed, cancelled, and lost. 'cancelled' records one external task being cancelled and is distinct from the Run-level run.cancelled lifecycle event (RFC 010); both can occur for the same cancellation."
+    },
+    "lastReconciledAt": { "type": "string", "format": "date-time", "description": "When the owning gateway last reconciled this attempt against the external system." },
+    "supersedesAttemptId": { "type": "string", "minLength": 1, "description": "Attempt this one replaces, set when the attempt was created by retryRun." },
+    "idempotencyKey": { "type": "string", "minLength": 1, "description": "Echo of the submitRun idempotency key, so a resubmit after restart converges on the existing external task instead of double-submitting." },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

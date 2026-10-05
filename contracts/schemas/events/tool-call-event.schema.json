@@ -16,7 +16,15 @@
             "toolName": { "type": "string", "minLength": 1 },
             "status": { "type": "string", "enum": ["started", "succeeded", "failed"] },
             "latencyMs": { "type": "integer", "minimum": 0 },
-            "tokenCost": { "type": "integer", "minimum": 0 }
+            "tokenCost": { "type": "integer", "minimum": 0, "description": "Total tokens for the call. Remains required. inputTokens + outputTokens is not required to equal tokenCost; providers report differently. (RFC 012)" },
+            "inputTokens": { "type": "integer", "minimum": 0, "description": "Prompt tokens for the call, when the provider reports the split. (RFC 012)" },
+            "outputTokens": { "type": "integer", "minimum": 0, "description": "Completion tokens for the call, when the provider reports the split. (RFC 012)" },
+            "modelId": { "type": "string", "minLength": 1, "description": "Provider model identifier the call was served by; the same tokenCost costs an order of magnitude apart across models, so accounting needs this to be meaningful. (RFC 012)" },
+            "provider": { "type": "string", "minLength": 1, "description": "Serving provider (for example vertex, bedrock, openai). (RFC 012)" },
+            "modelTier": { "$ref": "../common/model-routing-policy.schema.json#/properties/defaultTier", "description": "Routing tier actually used, matching ModelRoutingPolicy.defaultTier; eval scores are not comparable across tiers without it. (RFC 012)" },
+            "spendUsd": { "type": "number", "minimum": 0, "description": "Provider-reported billable amount for this call, not a normalized cross-provider estimate. Aggregates into UsageMeter.externalSpendUsd and is enforced against BudgetPolicy.maxSpendUsd. (RFC 012)" },
+            "uncertainty": { "$ref": "../common/uncertainty.schema.json", "description": "Per-call uncertainty or confidence hints; GAP-002 dispositions Uncertainty onto eval and reasoning payloads, and this adds the missing carrier on tool.call. (RFC 012)" },
+            "attemptId": { "type": "string", "minLength": 1, "description": "ExecutionAttempt.attemptId of the attempt this call was made under, when the Run executes through an external task system. The journal.* counterpart is payload.details.attemptId. (RFC 022)" }
           },
           "additionalProperties": false
         }

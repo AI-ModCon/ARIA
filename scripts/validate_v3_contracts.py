@@ -64,13 +64,43 @@ def _matches_type(value: object, expected_type: str) -> bool:
     return True
 
 
+def _resolve_pointer(document: dict, pointer: str) -> dict | None:
+    """Walk an RFC 6901 JSON pointer (e.g. '/properties/defaultTier') within a document."""
+    if pointer in ("", "/"):
+        return document
+    current: object = document
+    for raw_token in pointer.lstrip("/").split("/"):
+        token = raw_token.replace("~1", "/").replace("~0", "~")
+        if isinstance(current, list):
+            if not token.isdigit() or int(token) >= len(current):
+                return None
+            current = current[int(token)]
+        elif isinstance(current, dict):
+            if token not in current:
+                return None
+            current = current[token]
+        else:
+            return None
+    return current if isinstance(current, dict) else None
+
+
 def _resolve_ref(ref: str, current_schema_path: Path, schemas_by_id: dict[str, dict], schemas_by_path: dict[Path, dict]) -> tuple[dict | None, Path | None]:
-    if ref.startswith("#"):
-        return None, None
-    if ref.startswith("http://") or ref.startswith("https://"):
-        return schemas_by_id.get(ref), None
-    target_path = (current_schema_path.parent / ref).resolve()
-    return schemas_by_path.get(target_path), target_path
+    base, _, pointer = ref.partition("#")
+    if not base:
+        # Same-document pointer; resolve against the document currently being walked.
+        document = schemas_by_path.get(current_schema_path.resolve())
+        if document is None or not pointer:
+            return None, None
+        return _resolve_pointer(document, pointer), current_schema_path
+    if base.startswith("http://") or base.startswith("https://"):
+        document = schemas_by_id.get(base)
+        target_path = None
+    else:
+        target_path = (current_schema_path.parent / base).resolve()
+        document = schemas_by_path.get(target_path)
+    if document is None or not pointer:
+        return document, target_path
+    return _resolve_pointer(document, pointer), target_path
 
 
 def _validate_instance(
@@ -251,6 +281,8 @@ def main() -> int:
         "workflow-state.response.json": SCHEMAS_COMMON / "workflow-state.schema.json",
         "reasoning-node-event.json": SCHEMAS_EVENTS / "reasoning-node-event.schema.json",
         "tool-call-event.json": SCHEMAS_EVENTS / "tool-call-event.schema.json",
+        "tool-call-event-accounting.json": SCHEMAS_EVENTS / "tool-call-event.schema.json",
+        "run-lifecycle-cancelled.json": SCHEMAS_EVENTS / "run-lifecycle-event.schema.json",
         "agent-message.request.json": SCHEMAS_COMMON / "agent-message.schema.json",
         "agent-message-run-correlated.request.json": SCHEMAS_COMMON / "agent-message.schema.json",
         "handoff.request.json": SCHEMAS_COMMON / "handoff.schema.json",
@@ -261,6 +293,7 @@ def main() -> int:
         "intervention-record.request.json": SCHEMAS_COMMON / "intervention-record.schema.json",
         "identity-session.response.json": SCHEMAS_COMMON / "identity-session.schema.json",
         "events-journal-append.request.json": SCHEMAS_EVENTS / "event-envelope.schema.json",
+        "events-journal-attempt.request.json": SCHEMAS_EVENTS / "event-envelope.schema.json",
         "classification-shift-event.json": SCHEMAS_EVENTS / "event-envelope.schema.json",
     }
 
@@ -452,6 +485,9 @@ def main() -> int:
         ("data-movement-intent.example.json", companion_schema_dir / "data-movement-intent.schema.json"),
         ("eval-publication.example.json", companion_schema_dir / "eval-publication.schema.json"),
         ("run-invocation.example.json", companion_schema_dir / "run-invocation.schema.json"),
+        ("execution-attempt.example.json", companion_schema_dir / "execution-attempt.schema.json"),
+        ("execution-attempt-retry.example.json", companion_schema_dir / "execution-attempt.schema.json"),
+        ("execution-attempt-lost.example.json", companion_schema_dir / "execution-attempt.schema.json"),
     ]
     if not FIXTURES_COMPANION.exists():
         errors.append(f"Missing companion fixtures directory: {FIXTURES_COMPANION}")

@@ -15,8 +15,10 @@
             "run.target_failed",
             "run.retry",
             "run.completed",
-            "run.failed"
-          ]
+            "run.failed",
+            "run.cancelled"
+          ],
+          "description": "run.cancelled records an initiator-driven transition from queued or running to cancelled: payload.status MUST be 'cancelled' and payload.failureClass MUST be 'F0_NONE', because cancellation is not a failure. Implementations cancelling because an upstream step failed emit run.failed with the appropriate failureClass instead. An ExecutionAttempt with status 'cancelled' records one external task being cancelled and is a distinct, attempt-level record. (RFC 010)"
         },
         "payload": {
           "type": "object",

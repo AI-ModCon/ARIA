@@ -10,6 +10,7 @@ Deployments that commit to validating these artefacts may adopt **[profiles/core
 | DataMovementIntent | [schemas/data-movement-intent.schema.json](schemas/data-movement-intent.schema.json) | Declarative move/stage request; actual Globus/ObjectStore execution lives in mover **capabilities**. |
 | EvalPublication | [schemas/eval-publication.schema.json](schemas/eval-publication.schema.json) | Publication / leaderboard metadata keyed to spine `suiteId` / `evalId` results. |
 | RunInvocation | [schemas/run-invocation.schema.json](schemas/run-invocation.schema.json) | Literal invocation `inputs` / `parameters` and `outputs` (including MAG `tool_calls`) behind a spine `ExecutionContext`; link from Run via `contextHash`. See [run-invocation-interop.md](run-invocation-interop.md). |
+| ExecutionAttempt | [schemas/execution-attempt.schema.json](schemas/execution-attempt.schema.json) | External task identity for one Run attempt (scheduler job via IRI, Globus Compute task, Globus Transfer task) with reconciliation-after-restart semantics; listed by `runId`, referenced from `journal.*` events via `payload.details.attemptId` and from `tool.call` via `payload.attemptId`. |
 
 **Versioning:** additive optional fields compatible with repo-wide JSON Schema conventions; companion `$id` URIs live under `https://gmp.dev/contracts/companion/schemas/`.
 

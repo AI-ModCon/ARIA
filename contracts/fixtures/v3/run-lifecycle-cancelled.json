@@ -1,0 +1,19 @@
+{
+  "eventId": "evt_run_cancelled_01",
+  "eventType": "run.cancelled",
+  "occurredAt": "2026-10-01T15:31:44Z",
+  "source": "run-controller",
+  "correlationId": "run-7f3e2a",
+  "payload": {
+    "runId": "run-7f3e2a",
+    "capabilityId": "cap.md.simulate",
+    "status": "cancelled",
+    "failureClass": "F0_NONE",
+    "targetOutcomes": [
+      {
+        "targetId": "alcf-aurora",
+        "state": "skipped"
+      }
+    ]
+  }
+}
