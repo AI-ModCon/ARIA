@@ -10,11 +10,14 @@ and this project adheres to semantic-style version labels used by the ARIA spec 
 ### Added
 
 - Added Apache 2.0 `LICENSE`, `NOTICE`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md` adapted from the ModCon BaseTemplate.
+- Implemented RFC 018: optional `runId` and `correlationId` on `AgentMessage` and `Handoff`, plus optional `capabilityTokenRef` and `budgetRef` on `Handoff`, so coordination records can be correlated with a Run's journal and can reference the authority and allocation the handed-off work operates under (#29).
+- Added `agent-message-run-correlated.request.json` and `handoff-attenuated.request.json` fixtures with validator coverage for the RFC 018 fields.
 
 ### Changed
 
 - Aligned RFC process documentation with the implementation-ready workflow: the RFC PR now stays open during implementation and merges after the implementation PR lands (#25).
 - Added GitHub issue and pull request templates under `.github/`.
+- Bumped `core-v3` and `core-v3-companion` profiles and the `gmp-core-v3.yaml` description revision to 3.0.2 for the additive RFC 018 fields.
 
 ## [v0.3.5] - 2026-06-11
 

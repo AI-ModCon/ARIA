@@ -1,6 +1,6 @@
 {
   "profileId": "core-v3",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Mandatory GMP core profile for v3 unified deployments (operational backbone + agent-native surface).",
   "requiredApiSpec": "../openapi/gmp-core-v3.yaml",
   "requiredOperations": [
