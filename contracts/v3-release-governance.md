@@ -6,6 +6,7 @@ This stub replaces archived [v2-release-governance.md](archive/v2/v2-release-gov
 
 - **Contract patch**: additive JSON Schema and optional OpenAPI fields only; profile `version` patch bump.
 - **Contract minor**: new optional operations or new experimental routes under `/v3/experimental/*`; profile minor bump with release notes.
+  Removing a field from a schema `required` array is also minor: every existing payload stays valid, but consumers lose the guarantee that the field is present. Release notes must name the field and any condition under which it is still required. First applied in 3.1.0 (RFC 017: `ExecutionContext.seedList` and `dataVersion`, re-required by `runClass`).
 - **Contract major**: breaking semantics or removal of required operations → new major API path (for example `/v4/...`) and new profile id.
 
 ## GA exit criteria (checklist)

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: GMP Core API
-  version: 3.0.3
+  version: 3.1.0
   description: >-
     Genesis Mission Platform v3 unified API: operational backbone (sessions, capability
     registry, policy, run lifecycle, availability, events) plus agent-native identity,

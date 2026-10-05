@@ -1,6 +1,6 @@
 {
   "profileId": "core-v3",
-  "version": "3.0.3",
+  "version": "3.1.0",
   "description": "Mandatory GMP core profile for v3 unified deployments (operational backbone + agent-native surface).",
   "requiredApiSpec": "../openapi/gmp-core-v3.yaml",
   "requiredOperations": [
@@ -114,7 +114,8 @@
     "budget_policy_enforced",
     "reasoning_trace_queryable",
     "sandbox_gate_apply_rollback_validated",
-    "supervision_workflows_validated"
+    "supervision_workflows_validated",
+    "execution_context_run_class_enforced"
   ],
   "extensionPolicy": {
     "allowed": true,
