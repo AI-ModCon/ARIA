@@ -17,7 +17,7 @@ profile ids rather than a v3 minor.
 | `paused` in Run status; `run.paused`/`run.resumed` lifecycle events (paused runs were unrepresentable in the Run document) | [schemas/v4/run.schema.json](schemas/v4/run.schema.json), [schemas/v4/run-lifecycle-event.schema.json](schemas/v4/run-lifecycle-event.schema.json) | RFC 019 |
 | `AgentMessage.expiresAt` optional, with defined must-not-deliver-after semantics when present | [schemas/v4/agent-message.schema.json](schemas/v4/agent-message.schema.json) | RFC 020 |
 | `resolveAgentConsensus` and `listDivergenceAlerts` demoted to `/v4/experimental/` (no known implementation; graduation requires two independent implementations) | [openapi/gmp-core-v4.yaml](openapi/gmp-core-v4.yaml), module descriptors | RFC 021 |
-| `ExecutionAttempt` companion schema: one external-task-identity record (Slurm/PBS via IRI, Globus Compute, Globus Transfer) with reconciliation-after-restart semantics | [companion/schemas/execution-attempt.schema.json](companion/schemas/execution-attempt.schema.json) | RFC 022 |
+| `ExecutionAttempt` companion schema — **landed on the v3 line** (implemented with RFCs 010/012 in #37, 3.0.3); v4 inherits it unchanged | [companion/schemas/execution-attempt.schema.json](companion/schemas/execution-attempt.schema.json) | RFC 022 (merged) |
 
 The RFCs are filed as PRs #27–#33.
 

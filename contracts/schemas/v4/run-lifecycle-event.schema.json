@@ -18,6 +18,7 @@
             "run.retry",
             "run.completed",
             "run.failed",
+            "run.cancelled",
             "run.paused",
             "run.resumed"
           ]

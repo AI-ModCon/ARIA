@@ -31,7 +31,6 @@ OPENAPI_V4 = CONTRACTS / "openapi" / "gmp-core-v4.yaml"
 PROFILE_MINIMAL = CONTRACTS / "profiles" / "core-v4-minimal.json"
 PROFILE_MODULES = CONTRACTS / "profiles" / "core-v4-modules.json"
 PROFILE_FEDERATION = CONTRACTS / "profiles" / "federation-v4.json"
-SCHEMA_ATTEMPT = CONTRACTS / "companion" / "schemas" / "execution-attempt.schema.json"
 
 
 def _operation_ids(openapi_path: Path) -> set[str]:
@@ -122,9 +121,6 @@ def main() -> int:
         "agent-message-run-correlated.request.json": SCHEMAS_V4 / "agent-message.schema.json",
         "handoff-attenuated.request.json": SCHEMAS_V4 / "handoff.schema.json",
         "execution-context-instrument.request.json": SCHEMAS_V4 / "execution-context.schema.json",
-        "execution-attempt-scheduler.json": SCHEMA_ATTEMPT,
-        "execution-attempt-globus-compute.json": SCHEMA_ATTEMPT,
-        "execution-attempt-globus-transfer.json": SCHEMA_ATTEMPT,
         "execution-context-analysis.request.json": SCHEMAS_V4 / "execution-context.schema.json",
         "journal-message-expired.event.json": SCHEMAS_V4 / "journal-envelope-event.schema.json",
     }
