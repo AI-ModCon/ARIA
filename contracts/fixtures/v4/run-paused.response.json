@@ -1,0 +1,19 @@
+{
+  "runId": "run-7f3e2a",
+  "capabilityId": "cap-genome-screen",
+  "status": "paused",
+  "submittedAt": "2026-10-01T15:00:00Z",
+  "executionContext": {
+    "configHash": "e07512512514b1450fcbe5033dbbeb39b103c13be2c5b56e162030dc2e6bc3d9",
+    "environmentHash": "55bf1260d078172fcf9b3bf7772f6fc1b9089e7685ef8a292f308dde91b465fc",
+    "runClass": "analysis",
+    "dataVersion": "refseq-2026-08"
+  },
+  "failureClass": "F0_NONE",
+  "workflowState": {
+    "runId": "run-7f3e2a",
+    "stateVersion": 4,
+    "status": "paused",
+    "updatedAt": "2026-10-01T15:05:00Z"
+  }
+}

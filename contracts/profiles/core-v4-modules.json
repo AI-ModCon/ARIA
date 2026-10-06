@@ -1,0 +1,128 @@
+{
+  "profileId": "core-v4-modules",
+  "version": "4.0.0-draft",
+  "extendsProfileId": "core-v4-minimal",
+  "description": "Named optional modules for GMP v4. A deployment claims the modules it implements; conformance levels in federation-v4.json are defined as module bundles. Module operations partition the non-minimal v4 surface exactly. Proposed by RFC 016; experimental demotions per RFC 021.",
+  "modules": {
+    "durable-execution": {
+      "requiredOperations": [
+        "planRun",
+        "pauseRun",
+        "resumeRun",
+        "listRunCheckpoints"
+      ],
+      "requiredSchemas": [
+        "../schemas/common/checkpoint.schema.json",
+        "../schemas/common/resume-token.schema.json"
+      ],
+      "complianceChecks": [
+        "durable_execution_resume_replay_safe"
+      ]
+    },
+    "memory": {
+      "requiredOperations": [
+        "writeMemoryRecord",
+        "queryMemoryRecords",
+        "summarizeMemoryRecords",
+        "forgetMemoryRecords"
+      ],
+      "requiredSchemas": [
+        "../schemas/common/memory-record.schema.json",
+        "../schemas/common/memory-policy.schema.json",
+        "../schemas/common/memory-sharing.schema.json"
+      ],
+      "complianceChecks": [
+        "memory_policy_enforced"
+      ]
+    },
+    "accounting": {
+      "requiredOperations": [
+        "getTaskUsage",
+        "allocateBudget",
+        "enforceBudget"
+      ],
+      "requiredSchemas": [
+        "../schemas/common/usage-meter.schema.json",
+        "../schemas/common/budget-policy.schema.json",
+        "../schemas/common/cost-latency-hint.schema.json"
+      ],
+      "complianceChecks": [
+        "budget_policy_enforced"
+      ]
+    },
+    "evals": {
+      "requiredOperations": [
+        "runEval",
+        "getEvalResult"
+      ],
+      "requiredSchemas": [
+        "../schemas/common/eval-result.schema.json"
+      ],
+      "complianceChecks": [
+        "reasoning_trace_queryable"
+      ],
+      "notes": "reasoning_trace_queryable lives here, not on the minimal floor: it requires reasoning-node events to exist and be retrievable by correlation, which a deployment with no reasoning workloads cannot evidence. (RFC 016)"
+    },
+    "coordination": {
+      "requiredOperations": [
+        "sendAgentMessage",
+        "handoffAgentTask"
+      ],
+      "experimentalOperations": [
+        "resolveAgentConsensus"
+      ],
+      "requiredSchemas": [
+        "../schemas/v4/agent-message.schema.json",
+        "../schemas/v4/handoff.schema.json"
+      ],
+      "experimentalSchemas": [
+        "../schemas/common/consensus-decision.schema.json"
+      ],
+      "complianceChecks": []
+    },
+    "sandbox": {
+      "requiredOperations": [
+        "proposeAction",
+        "approveAction",
+        "applyAction",
+        "rollbackAction"
+      ],
+      "requiredSchemas": [
+        "../schemas/common/sandbox-policy.schema.json",
+        "../schemas/common/side-effect-manifest.schema.json",
+        "../schemas/common/approval-gate.schema.json"
+      ],
+      "complianceChecks": [
+        "sandbox_gate_apply_rollback_validated"
+      ]
+    },
+    "supervision": {
+      "requiredOperations": [
+        "listSupervisionQueue",
+        "recordIntervention"
+      ],
+      "experimentalOperations": [
+        "listDivergenceAlerts"
+      ],
+      "requiredSchemas": [
+        "../schemas/common/supervision-queue-item.schema.json",
+        "../schemas/common/intervention-record.schema.json"
+      ],
+      "experimentalSchemas": [
+        "../schemas/common/divergence-alert.schema.json"
+      ],
+      "complianceChecks": [
+        "supervision_workflows_validated"
+      ]
+    },
+    "availability": {
+      "requiredOperations": [
+        "listTargetAvailability"
+      ],
+      "requiredSchemas": [
+        "../schemas/common/availability.schema.json"
+      ],
+      "complianceChecks": []
+    }
+  }
+}

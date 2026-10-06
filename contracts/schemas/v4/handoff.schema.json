@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/v4/handoff.schema.json",
+  "title": "Handoff",
+  "type": "object",
+  "required": [
+    "handoffId",
+    "fromAgentId",
+    "toAgentId",
+    "taskRef",
+    "reason",
+    "createdAt"
+  ],
+  "properties": {
+    "handoffId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fromAgentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "toAgentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "taskRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Run on whose behalf this handoff is made; MUST be set when emitted in the context of a Run. (RFC 018)"
+    },
+    "correlationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "SHOULD match the correlation field of the corresponding appendEvent records. (RFC 018)"
+    },
+    "capabilityTokenRef": {
+      "type": "string",
+      "minLength": 1,
+      "description": "tokenId of the capability token (capability-token.schema.json) the receiving workload operates under. The handoff record is not a credential: setting this field does not grant the token, and the receiver must present the token and pass the ordinary use-time checks (bearer subject, unexpired, unrevoked, delegator still entitled). Attenuation stays in the token's scope and delegation. (RFC 018)"
+    },
+    "budgetRef": {
+      "type": "string",
+      "minLength": 1,
+      "description": "BudgetPolicy.budgetId of the allocation (from allocateBudget) the handed-off work draws against; not a usage-meter id. (RFC 018)"
+    }
+  },
+  "additionalProperties": false
+}

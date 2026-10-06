@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gmp.dev/contracts/schemas/v4/event-envelope.schema.json",
+  "title": "GmpEvent",
+  "description": "Discriminated union of all first-class platform events (run lifecycle, policy, reasoning, tool calls, journal lineage).",
+  "oneOf": [
+    {
+      "$ref": "./run-lifecycle-event.schema.json"
+    },
+    {
+      "$ref": "../events/policy-check-event.schema.json"
+    },
+    {
+      "$ref": "../events/reasoning-node-event.schema.json"
+    },
+    {
+      "$ref": "../events/tool-call-event.schema.json"
+    },
+    {
+      "$ref": "./journal-envelope-event.schema.json"
+    },
+    {
+      "$ref": "../events/classification-shift-event.schema.json"
+    }
+  ]
+}
