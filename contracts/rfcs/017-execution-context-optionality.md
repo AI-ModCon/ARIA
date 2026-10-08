@@ -50,10 +50,13 @@ provenance value the fields exist to provide.
   demonstrably costs reproducibility. `analysis` = deterministic computation over
   versioned external data; `reproducible` = stochastic computation where seeds and
   data versions both bind.
-- Profile hook: profiles that host reproducibility-bearing science (e.g. the RFC 016
-  `evals` module, or a deployment profile for simulation campaigns) add a compliance
-  check **`execution_context_run_class_enforced`**, evaluated against fixtures of all three
-  classes as above. `minimal-core-v3` does not require `runClass` to be present.
+- Profile hook: a compliance check **`execution_context_run_class_enforced`**, evaluated
+  against fixtures of all three classes as above. `runClass` itself stays optional; the
+  check is what makes the discriminator live. This RFC originally hosted it on the RFC 016
+  `evals` module, which does not exist on the v3 line, so the implementation lands it on
+  [`core-v3.json`](../profiles/core-v3.json) and
+  [`core-v3-companion.json`](../profiles/core-v3-companion.json). If RFC 016 lands, the
+  check should move to `evals`. `runClass` is not required to be present on every run.
 - Normative omission rule, carried in the schema `description` of both fields (removing
   them from `required` does not by itself reject `[0]` or `"n/a"`): *"When semantically
   inapplicable this field MUST be omitted, never filled with a placeholder; placeholder
@@ -61,6 +64,21 @@ provenance value the fields exist to provide.
 - No change to the companion
   [`run-invocation.schema.json`](../companion/schemas/run-invocation.schema.json)
   `contextHash` linkage.
+
+## Implementation notes (settled in #38)
+
+- **Validator.** In-schema `if`/`then` is not self-enforcing: the v3 contract validator
+  ignored `if`, `then`, and `const`, so a `runClass: reproducible` context with no
+  `seedList` validated clean. The implementation teaches `_validate_instance` those
+  keywords and stops `allOf` from short-circuiting sibling `required` /
+  `additionalProperties` checks. Conformance kits MUST include negative fixtures that
+  prove the conditional rejects, not only fixtures that pass.
+- **`analysis` class.** Ships as drafted. A binary split would force deterministic
+  screens to placeholder a seed or drop `dataVersion`.
+- **Version.** Removing a field from `required` keeps every existing payload valid but
+  takes a consumer guarantee, which [`v3-release-governance.md`](../v3-release-governance.md)
+  did not previously cover. Recorded as a contract minor: `core-v3`, `core-v3-companion`,
+  and the OpenAPI description revision go to **3.1.0**.
 
 ## Reference
 
