@@ -5,7 +5,8 @@ Dependency-free validator (stdlib only). It checks:
 1) v3 envelope files exist
 2) core-v3 plus core-v3-companion profile required schema paths resolve
 3) schema and fixture files are valid JSON (including companion/schemas)
-4) fixture payloads satisfy recursive required/type/enum/allOf/oneOf/$ref rules
+4) fixture payloads satisfy recursive required/type/enum/const/allOf/oneOf/
+   if-then-else/$ref rules
 """
 
 from __future__ import annotations
@@ -62,6 +63,13 @@ def _matches_type(value: object, expected_type: str) -> bool:
     if expected_type == "null":
         return value is None
     return True
+
+
+def _equals_const(value: object, expected: object) -> bool:
+    """JSON equality for const: Python treats True == 1, JSON Schema does not."""
+    if isinstance(value, bool) or isinstance(expected, bool):
+        return isinstance(value, bool) and isinstance(expected, bool) and value is expected
+    return value == expected
 
 
 class PointerError(ValueError):
@@ -195,6 +203,8 @@ def _validate_instance(
             return [f"{context}: no oneOf branch validated"]
         return errors
 
+    # allOf does not short-circuit: sibling keywords (properties, required,
+    # additionalProperties) on the same schema must still be evaluated.
     if "allOf" in schema:
         all_of = schema.get("allOf", [])
         if isinstance(all_of, list):
@@ -210,7 +220,33 @@ def _validate_instance(
                             schemas_by_path,
                         )
                     )
-        return errors
+
+    # A failing "if" is not itself an error; it only selects "then" or "else".
+    if "if" in schema and isinstance(schema["if"], dict):
+        if_errors = _validate_instance(
+            instance,
+            schema["if"],
+            schema_path,
+            f"{context}.if",
+            schemas_by_id,
+            schemas_by_path,
+        )
+        branch_key = "else" if if_errors else "then"
+        branch = schema.get(branch_key)
+        if isinstance(branch, dict):
+            errors.extend(
+                _validate_instance(
+                    instance,
+                    branch,
+                    schema_path,
+                    f"{context}.{branch_key}",
+                    schemas_by_id,
+                    schemas_by_path,
+                )
+            )
+
+    if "const" in schema and not _equals_const(instance, schema["const"]):
+        errors.append(f"{context}: value '{instance}' does not equal const '{schema['const']}'")
 
     expected_type = schema.get("type")
     if isinstance(expected_type, list):
@@ -363,6 +399,60 @@ def _pointer_self_test() -> list[str]:
     return [f"Pointer self-test: {f}" for f in failures]
 
 
+def _without(document: dict, *fields: str) -> dict:
+    return {key: value for key, value in document.items() if key not in fields}
+
+
+def _check_execution_context_run_class(
+    schemas_by_id: dict[str, dict],
+    schemas_by_path: dict[Path, dict],
+) -> list[str]:
+    """RFC 017 negative checks: execution_context_run_class_enforced.
+
+    A passing fixture suite cannot show that the runClass conditional binds,
+    because an engine that ignores if/then also passes it. Each mutated
+    context below must be rejected, and the controls must be accepted.
+    """
+    schema_path = (SCHEMAS_COMMON / "execution-context.schema.json").resolve()
+    try:
+        schema = _read_json(schema_path)
+        reproducible = _read_json(FIXTURES / "execution-context-reproducible.request.json")
+        analysis = _read_json(FIXTURES / "execution-context-analysis.request.json")
+        operational = _read_json(FIXTURES / "execution-context-operational.request.json")
+    except Exception as exc:
+        return [f"RFC 017 run-class checks could not load inputs: {exc}"]
+
+    def validate(instance: dict, against: dict, label: str) -> list[str]:
+        return _validate_instance(instance, against, schema_path, label, schemas_by_id, schemas_by_path)
+
+    errors: list[str] = []
+    must_reject = {
+        "reproducible-minus-seedList": _without(reproducible, "seedList"),
+        "reproducible-minus-dataVersion": _without(reproducible, "dataVersion"),
+        "analysis-minus-dataVersion": _without(analysis, "dataVersion"),
+    }
+    for label, instance in must_reject.items():
+        if not validate(instance, schema, label):
+            errors.append(f"RFC 017: {label} was accepted; the runClass conditional is not enforced")
+
+    must_accept = {
+        "operational-explicit-without-seed-or-dataVersion": {**operational, "runClass": "operational"},
+        "analysis-without-seedList": analysis,
+    }
+    for label, instance in must_accept.items():
+        rejection = validate(instance, schema, label)
+        if rejection:
+            errors.append(f"RFC 017: {label} was rejected; seedList/dataVersion were re-required unconditionally: {rejection}")
+
+    # The rejection above must come from the conditional, not from a re-widened
+    # base required array: with allOf removed the same mutation has to pass.
+    unconditional = _without(schema, "allOf")
+    if validate(must_reject["reproducible-minus-seedList"], unconditional, "base-schema-control"):
+        errors.append("RFC 017: base ExecutionContext schema rejects a context without seedList; required must stay [configHash, environmentHash]")
+
+    return errors
+
+
 def main() -> int:
     errors: list[str] = []
 
@@ -432,6 +522,9 @@ def main() -> int:
         "events-journal-append.request.json": SCHEMAS_EVENTS / "event-envelope.schema.json",
         "events-journal-attempt.request.json": SCHEMAS_EVENTS / "event-envelope.schema.json",
         "classification-shift-event.json": SCHEMAS_EVENTS / "event-envelope.schema.json",
+        "execution-context-operational.request.json": SCHEMAS_COMMON / "execution-context.schema.json",
+        "execution-context-analysis.request.json": SCHEMAS_COMMON / "execution-context.schema.json",
+        "execution-context-reproducible.request.json": SCHEMAS_COMMON / "execution-context.schema.json",
     }
 
     for fixture_name, schema_path in direct_mappings.items():
@@ -457,6 +550,8 @@ def main() -> int:
             )
         except Exception as exc:
             errors.append(f"Validation error for {fixture_path}: {exc}")
+
+    errors.extend(_check_execution_context_run_class(schemas_by_id, schemas_by_path))
 
     wrapper_schemas = {
         "runs-plan.response.json": {

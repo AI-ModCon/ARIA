@@ -16,8 +16,16 @@ and this project adheres to semantic-style version labels used by the ARIA spec 
 - Implemented RFC 012: optional `inputTokens`, `outputTokens`, `modelId`, `provider`, `modelTier`, `spendUsd`, and `uncertainty` accounting fields on the `tool.call` event payload, plus an optional `attemptId` that gives RFC 022 its `tool.call` event binding (#18).
 - Implemented RFC 010: `run.cancelled` on the `RunLifecycleEvent.eventType` enum, so an initiator-driven cancellation is recorded as a first-class lifecycle event instead of a `run.failed` with a `cancelled` status (#16).
 - Added `execution-attempt.example.json`, `execution-attempt-retry.example.json`, and `execution-attempt-lost.example.json` companion fixtures, plus `tool-call-event-accounting.json`, `run-lifecycle-cancelled.json`, and `events-journal-attempt.request.json` under `fixtures/v3/`, all with validator coverage. `run-lifecycle-cancelled.json` is the first direct fixture for `run-lifecycle-event.schema.json`.
+- Implemented RFC 017: optional `runClass` (`reproducible`, `analysis`, `operational`) on `ExecutionContext`, which re-requires `seedList` and `dataVersion` for reproducible runs and `dataVersion` for analysis runs through in-schema `if`/`then`. Both field descriptions now state that an inapplicable field MUST be omitted rather than filled with a placeholder such as `[0]` or `"n/a"` (#28).
+- Added the `execution_context_run_class_enforced` compliance check to `core-v3` and `core-v3-companion`.
+- Added `execution-context-operational.request.json`, `execution-context-analysis.request.json`, and `execution-context-reproducible.request.json` fixtures, plus validator negative checks that reject a reproducible context missing `seedList` or `dataVersion` and an analysis context missing `dataVersion`.
 
 ### Changed
+
+- Removed `seedList` and `dataVersion` from the `ExecutionContext` `required` array (RFC 017, #28). Every existing payload stays valid, but consumers can no longer assume either field is present; `configHash` and `environmentHash` remain required. They are still required when `runClass` is `reproducible` (both) or `analysis` (`dataVersion`).
+- Taught the contract validator to evaluate `if`/`then`/`else` and `const`, which it previously ignored, so the RFC 017 conditional would have passed any payload. `allOf` no longer short-circuits sibling keywords, so a schema that combines `allOf` with top-level `properties` and `required` is now checked in full.
+- Recorded in `v3-release-governance.md` that removing a field from a schema `required` array is a contract minor.
+- Bumped `core-v3` and `core-v3-companion` profiles and the `gmp-core-v3.yaml` description revision to 3.1.0 for RFC 017.
 
 - Taught the contract validator to resolve JSON-pointer `$ref` fragments (for example `model-routing-policy.schema.json#/properties/defaultTier`), which previously reported as unresolved.
 - Aligned RFC process documentation with the implementation-ready workflow: the RFC PR now stays open during implementation and merges after the implementation PR lands (#25).
