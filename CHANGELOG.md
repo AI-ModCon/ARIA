@@ -19,6 +19,7 @@ and this project adheres to semantic-style version labels used by the ARIA spec 
 
 ### Changed
 
+- Taught the contract validator to evaluate the JSON Schema `pattern` keyword (unanchored `re.search` semantics per the spec, strings only, malformed regexes reported as errors), with build-time self-tests proving the keyword binds. Previously a 64-hex field such as `ExecutionContext.configHash` accepted values like `sha256:<hex>`; all existing v3 fixtures already conform, so no fixture changes were needed.
 - Taught the contract validator to resolve JSON-pointer `$ref` fragments (for example `model-routing-policy.schema.json#/properties/defaultTier`), which previously reported as unresolved.
 - Aligned RFC process documentation with the implementation-ready workflow: the RFC PR now stays open during implementation and merges after the implementation PR lands (#25).
 - Added GitHub issue and pull request templates under `.github/`.
