@@ -5,12 +5,13 @@ Dependency-free validator (stdlib only). It checks:
 1) v3 envelope files exist
 2) core-v3 plus core-v3-companion profile required schema paths resolve
 3) schema and fixture files are valid JSON (including companion/schemas)
-4) fixture payloads satisfy recursive required/type/enum/allOf/oneOf/$ref rules
+4) fixture payloads satisfy recursive required/type/enum/pattern/allOf/oneOf/$ref rules
 """
 
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -226,6 +227,20 @@ def _validate_instance(
         if instance not in schema["enum"]:
             errors.append(f"{context}: value '{instance}' not in enum {schema['enum']}")
 
+    # JSON Schema 'pattern' applies to string instances only and is
+    # unanchored (re.search semantics), per the spec; schemas that need
+    # full-string matches anchor explicitly with ^...$.
+    if "pattern" in schema and isinstance(instance, str):
+        pattern = schema["pattern"]
+        if not isinstance(pattern, str):
+            errors.append(f"{context}: schema 'pattern' must be a string, got {type(pattern).__name__}")
+        else:
+            try:
+                if re.search(pattern, instance) is None:
+                    errors.append(f"{context}: value '{instance}' does not match pattern '{pattern}'")
+            except re.error as exc:
+                errors.append(f"{context}: schema pattern '{pattern}' is not a valid regex: {exc}")
+
     if isinstance(instance, dict):
         required = schema.get("required", [])
         if isinstance(required, list):
@@ -280,6 +295,44 @@ def _validate_instance(
                 )
 
     return errors
+
+
+def _pattern_self_test() -> list[str]:
+    """Check the 'pattern' keyword binds and keeps JSON Schema semantics.
+
+    Before this keyword was evaluated, a 64-hex field such as
+    ExecutionContext.configHash accepted values like 'sha256:<hex>' (71
+    characters against ^[a-fA-F0-9]{64}$) — found on the v4 draft fixtures in
+    the #34 review. A green suite cannot show the keyword binds, so these
+    cases run on every invocation; stdlib only, no test framework.
+    """
+    hex64 = "deadbeef" * 8
+    hash_schema = {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"}
+
+    def validate(instance: object, schema: dict, label: str) -> list[str]:
+        return _validate_instance(instance, schema, Path("pattern-self-test"), label, {}, {})
+
+    failures: list[str] = []
+    # Anchored pattern: canonical 64-hex accepted, prefixed/truncated rejected.
+    if validate(hex64, hash_schema, "hex64"):
+        failures.append("canonical 64-hex value was rejected")
+    for label, bad in (("prefixed", f"sha256:{hex64}"), ("truncated", hex64[:-1]), ("non-hex", "z" * 64)):
+        if not validate(bad, hash_schema, label):
+            failures.append(f"{label} hash value was accepted; pattern is not enforced")
+    # Unanchored semantics: 'pattern' uses re.search, not fullmatch.
+    if validate("deadbeefcafe", {"type": "string", "pattern": "beef"}, "unanchored"):
+        failures.append("unanchored pattern failed to match a substring (fullmatch semantics?)")
+    # Non-string instances are out of scope for 'pattern'.
+    if validate(7, {"pattern": "^[0-9]$"}, "non-string"):
+        failures.append("pattern was applied to a non-string instance")
+    # A malformed regex is a reported schema error, not a crash.
+    try:
+        if not validate(hex64, {"type": "string", "pattern": "["}, "bad-regex"):
+            failures.append("malformed schema regex was not reported")
+    except re.error:
+        failures.append("malformed schema regex raised instead of being reported")
+
+    return [f"Pattern self-test: {f}" for f in failures]
 
 
 def _pointer_self_test() -> list[str]:
@@ -367,6 +420,7 @@ def main() -> int:
     errors: list[str] = []
 
     errors.extend(_pointer_self_test())
+    errors.extend(_pattern_self_test())
 
     if not OPENAPI_V3.exists():
         errors.append(f"Missing required API spec: {OPENAPI_V3}")
